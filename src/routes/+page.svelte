@@ -3,6 +3,7 @@
   import welcome from "$lib/images/svelte-welcome.webp";
   import welcome_fallback from "$lib/images/svelte-welcome.png";
   import Card from "./_components/Card.svelte";
+  import Game from "./_components/Game.svelte";
 </script>
 
 <svelte:head>
@@ -22,11 +23,9 @@
     to your new<br />SvelteKit app
   </h1>
 
-  <h2>
-    try editing <strong>src/routes/+page.svelte</strong>
-  </h2>
+  <Game />
 
-  <Card title="test" description="test description" />
+  <!-- <Card title="test" description="test description" /> -->
   <Counter />
 </section>
 
