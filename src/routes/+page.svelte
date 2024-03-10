@@ -12,21 +12,12 @@
 </svelte:head>
 
 <section>
-  <h1>
-    <span class="welcome">
-      <picture>
-        <source srcset={welcome} type="image/webp" />
-        <img src={welcome_fallback} alt="Welcome" />
-      </picture>
-    </span>
-
-    to your new<br />SvelteKit app
-  </h1>
+  <h1>HTML 大富豪</h1>
 
   <Game />
 
   <!-- <Card title="test" description="test description" /> -->
-  <Counter />
+  <!-- <Counter /> -->
 </section>
 
 <style>
