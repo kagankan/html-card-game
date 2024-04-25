@@ -2,81 +2,77 @@
   import htmlSpec from "@markuplint/html-spec";
   import { createSelector } from "@markuplint/selector";
   import { browser } from "$app/environment";
+  import type { PermittedContentPattern } from "@markuplint/ml-spec";
 
   // TODO: ユニオン型にしたい
   type ElementName = (typeof htmlSpec.specs)[number]["name"];
-  const getContentModel = (
-    elementName: ElementName,
-    specs: typeof htmlSpec.specs,
-  ) => {
+
+  const getContentModel = (elementName: ElementName) => {
     const name = elementName.toLowerCase();
-    const spec = specs.find((s) => s.name === name);
-    if (spec) {
-      return spec.contentModel.contents;
-    }
-    return false;
+    const spec = htmlSpec.specs.find((s) => s.name === name);
+    return spec?.contentModel.contents;
   };
 
   let hand: ElementName[] = ["div", "span", "a", "hr", "p", "button"];
   let nesting: ElementName[] = ["body"];
   $: current = nesting[nesting.length - 1];
-  $: contentModel = getContentModel(current, htmlSpec.specs);
+  $: contentModel = getContentModel(current);
   $: {
     console.log(JSON.stringify(contentModel, null, 4));
   }
 
-  const getQuery = (nesting: readonly ElementName[]) => {
-    // TODO: 次に受け入れるクエリを生成する
-    // return nesting
-    //   .map((n, i) => {
-    //     if (i === 0) {
-    //       return n;
-    //     }
-    //     return ` > ${n}`;
-    //   })
-    //   .join("");
-  };
+  /** transparentの計算のための親のクエリ */
+  let lastQuery: string = "*";
+  $: {
+    console.log("lastQuery", lastQuery);
+  }
 
-  const canPlay = (tagName: string): boolean => {
-    // NOTE: Array.isArray だと絞り込みができずanyになってしまうのでこの判定
-    if (browser && contentModel !== null && typeof contentModel !== "boolean") {
-      const element = document.createElement(tagName);
-      const candidates = contentModel.flatMap((model) => {
-        if ("oneOrMore" in model) {
-          return typeof model.oneOrMore === "string"
-            ? [model.oneOrMore]
-            : model.oneOrMore;
-        } else if ("transparent" in model) {
-          // const parent = lastElement.parentElement;
-          // if (parent) {
-          //   return getContentModel(parent, htmlSpec.specs);
-          // } else {
-          // }
-          // TODO: 透過モデルの判定
-          return [model.transparent];
+  function isStringArray(
+    arr: readonly unknown[],
+  ): arr is string[] | readonly string[] {
+    return arr.every((item) => typeof item === "string");
+  }
+
+  // TODO: a > div > p > button が禁止されない aの子要素ルールが判定できてない
+  const flattenContentPattern = (
+    model: (typeof htmlSpec.specs)[number]["contentModel"]["contents"],
+  ): string[] => {
+    if (model === true) {
+      return ["*"];
+    } else if (model === false) {
+      return [":not(*)"];
+    } else {
+      return model.flatMap((m) => {
+        if ("oneOrMore" in m) {
+          if (typeof m.oneOrMore === "string") {
+            return [m.oneOrMore];
+          } else if (isStringArray(m.oneOrMore)) {
+            return m.oneOrMore;
+          } else {
+            return flattenContentPattern(m.oneOrMore);
+          }
+        } else if ("transparent" in m) {
+          return [`:is(${lastQuery}):is(${m.transparent})`];
         }
         return [];
       });
-      return candidates.some((model) => {
-        const result = createSelector(model, htmlSpec).match(element);
-        console.log(tagName, result);
-        return result !== false;
-      });
-    } else if (contentModel === true) {
-      return true;
     }
-    return false;
   };
 
-  if (browser) {
-    const sample1 = document.createElement("a");
-    document.createElement("div").appendChild(sample1);
-    const sample2 = document.createElement("a");
-    document.createElement("span").appendChild(sample2);
-
-    console.log(sample1.parentElement);
-    // console.log(getContentModel(sample2, htmlSpec.specs));
-  }
+  const checkNext = (
+    tagName: string,
+  ): { ok: false } | { ok: true; queries: string[] } => {
+    if (!browser || contentModel == null) return { ok: false };
+    const candidates = flattenContentPattern(contentModel);
+    const element = document.createElement(tagName);
+    const queries = candidates.filter((model) => {
+      const result = createSelector(model, htmlSpec).match(element);
+      return result !== false;
+    });
+    if (queries.length === 0) return { ok: false };
+    console.log(tagName, queries);
+    return { ok: true, queries: queries };
+  };
 </script>
 
 <p>{nesting.join(" > ")}</p>
@@ -87,12 +83,19 @@
     <li>
       <button
         on:click={() => {
-          if (canPlay(el)) {
+          const result = checkNext(el);
+          if (result.ok) {
+            if (result.queries.length > 1) {
+              // TODO: 2個以上になるケースがあるか検討
+              console.error(result.queries);
+            } else {
+              lastQuery = result.queries[0];
+            }
             nesting = [...nesting, el];
             hand = hand.filter((n) => n !== el);
           }
         }}
-        disabled={!canPlay(el)}>{el === "a" ? "a (hrefなし)" : el}</button
+        disabled={!checkNext(el).ok}>{el === "a" ? "a (hrefなし)" : el}</button
       >
     </li>
   {/each}
