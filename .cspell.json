@@ -8,6 +8,7 @@
     "typescript"
   ],
   "words": [
-    "markuplint"
+    "markuplint",
+    "tailwindcss"
   ]
 }
