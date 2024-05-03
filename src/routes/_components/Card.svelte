@@ -6,9 +6,9 @@
 </script>
 
 <section
-  class="aspect-[58/89] w-40 rounded-lg bg-white shadow {disabled
-    ? 'bg-gray-300 text-gray-700'
-    : ''}"
+  class="aspect-[58/89] w-40 rounded-lg shadow {disabled
+    ? 'bg-gray-300'
+    : 'bg-white'}"
 >
   <button
     type="button"
