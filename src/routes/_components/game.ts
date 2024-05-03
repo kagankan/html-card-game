@@ -118,3 +118,30 @@ export const checkNext = (
   }
   return true;
 };
+
+const isVoidElement = (element: ElementName): boolean => {
+  const contentModel = getContentModel(element);
+  return contentModel === false;
+};
+
+export const formatHtml = (
+  elements: readonly ElementName[],
+  space?: number,
+) => {
+  const breakText = space != null ? "\n" : "";
+
+  const result = elements.toReversed().reduce((acc, element, index) => {
+    const indent = space
+      ? `${" ".repeat(space * (elements.length - 1 - index))}`
+      : "";
+    if (isVoidElement(element)) {
+      if (index === 0) {
+        return `${indent}<${element}>`;
+      } else {
+        throw new Error("void element must be the last element");
+      }
+    }
+    return `${indent}<${element}>${breakText}${acc}${breakText}${indent}</${element}>`;
+  }, "");
+  return result;
+};

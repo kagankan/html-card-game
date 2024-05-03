@@ -1,5 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { checkNext, getTransparentContentModel, isStringArray } from "./game";
+import {
+  checkNext,
+  formatHtml,
+  getTransparentContentModel,
+  isStringArray,
+} from "./game";
 
 describe("isStringArray", () => {
   it("returns true when all elements are strings", () => {
@@ -84,5 +89,30 @@ describe("checkNext", () => {
     it("トランスペアレントモデルが処理される", () => {
       expect(checkNext(["span", "a"], "div")).toBe(false);
     });
+  });
+});
+
+describe("formatHtml", () => {
+  it("returns formatted html", () => {
+    expect(formatHtml(["ul", "li", "p"])).toBe("<ul><li><p></p></li></ul>");
+  });
+  it("空要素の処理", () => {
+    expect(formatHtml(["ul", "li", "p", "br"])).toBe(
+      "<ul><li><p><br></p></li></ul>",
+    );
+  });
+  it("空要素が途中に挟まっている場合はエラー", () => {
+    expect(() => formatHtml(["ul", "li", "br", "p"])).toThrowError();
+  });
+  it("インデント", () => {
+    expect(formatHtml(["ul", "li", "p", "br"], 2)).toBe(
+      `<ul>
+  <li>
+    <p>
+      <br>
+    </p>
+  </li>
+</ul>`,
+    );
   });
 });

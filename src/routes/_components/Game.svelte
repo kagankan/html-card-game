@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { checkNext } from "./game";
+  import { checkNext, formatHtml } from "./game";
   import { browser } from "$app/environment";
   import type { ElementName } from "./constants";
   import Card from "./Card.svelte";
@@ -19,7 +19,7 @@
   $: current = nesting[nesting.length - 1];
 </script>
 
-<p>{nesting.join(" > ")}</p>
+<pre><code>{formatHtml(nesting, 2)}</code></pre>
 
 <ul class=" mt-8 grid auto-cols-auto grid-flow-col">
   <!-- for -->
