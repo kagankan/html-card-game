@@ -1,7 +1,7 @@
 <script lang="ts">
-  import type {ElementName } from "./game";
   import  { checkNext} from "./game";
 import { browser } from "$app/environment";
+  import type { ElementName } from "./constants";
 
 let hand: ElementName[] = ["div", "span", "a", "hr", "p", "button"];
 let nesting: ElementName[] = ["body"];

@@ -1,9 +1,7 @@
 import htmlSpec from "@markuplint/html-spec";
 import { createSelector } from "@markuplint/selector";
+import type { ElementName } from "./constants";
 // import type { PermittedContentPattern } from "@markuplint/ml-spec";
-
-// TODO: ユニオン型にしたい
-export type ElementName = (typeof htmlSpec.specs)[number]["name"];
 
 const getContentModel = (elementName: ElementName) => {
   const name = elementName.toLowerCase();
@@ -49,9 +47,9 @@ const flattenContentPattern = (
  */
 export const checkNext = (
   /** 現在出ている要素の配列。この配列は仕様を満たしている前提 */
-  parents: string[],
+  parents: ElementName[],
   /** 次に出したい要素 */
-  tagName: string,
+  tagName: ElementName,
 ): boolean => {
   if (parents.length === 0) {
     return true; //{ ok: true, queries: ["*"] };
