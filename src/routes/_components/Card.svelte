@@ -1,13 +1,28 @@
-<script>
+<script lang="ts">
   export let title = "";
   export let description = "";
+  export let onClick: () => void;
+  export let disabled = false;
 </script>
 
-<section class="Card">
-  <ul class="Card__Categories">
-    <!-- <li>メタデータ</li> -->
+<section
+  class="aspect-[58/89] w-40 rounded-lg bg-white shadow {disabled
+    ? 'bg-gray-300 text-gray-700'
+    : ''}"
+>
+  <button
+    type="button"
+    on:click={onClick}
+    class="h-full w-full p-4 disabled:text-gray-500"
+    {disabled}
+  >
+    <span class="text-3xl font-bold">{title}</span>
+    {#if description}<span class="block">{description}</span>{/if}
+  </button>
+  <!-- <ul class="Card__Categories">
+    <li>メタデータ</li>
     <li class="category-flow">フロー</li>
-    <!-- <li>ヘディング</li> -->
+    <li>ヘディング</li>
     <li class="category-palpable">パルパブル</li>
   </ul>
   <p>4.4.15</p>
@@ -25,19 +40,5 @@
     </p>
   </div>
   <cite>https://momdo.github.io/html/grouping-content.html#the-div-element</cite
-  >
+  > -->
 </section>
-
-<style>
-  .Card {
-    background-color: #fff;
-    border-radius: 1rem;
-    box-shadow: 0 0 1rem rgba(0, 0, 0, 0.1);
-  }
-  .Card__Categories {
-    display: flex;
-    justify-content: space-between;
-    padding: 0;
-    margin: 0;
-  }
-</style>
