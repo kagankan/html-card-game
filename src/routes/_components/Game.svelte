@@ -3,7 +3,7 @@
 import { browser } from "$app/environment";
   import type { ElementName } from "./constants";
 
-let hand: ElementName[] = ["div", "span", "a", "hr", "p", "button"];
+let hand: ElementName[] = ["div", "span", "a", "hr", "p", "button", "ul", "li", "br"];
 let nesting: ElementName[] = ["body"];
 $: current = nesting[nesting.length - 1];
 </script>

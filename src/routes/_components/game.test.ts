@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { checkNext, isStringArray } from "./game";
+import { checkNext, getTransparentContentModel, isStringArray } from "./game";
 
 describe("isStringArray", () => {
   it("returns true when all elements are strings", () => {
@@ -8,6 +8,46 @@ describe("isStringArray", () => {
 
   it("returns false when any element is not a string", () => {
     expect(isStringArray(["a", "b", 1])).toBe(false);
+  });
+});
+
+describe("getTransparentContentModel", () => {
+  it("returns null when model is true", () => {
+    const modelOfDiv = [
+      {
+        oneOrMore: ":model(flow)",
+      },
+    ];
+    expect(getTransparentContentModel(modelOfDiv)).toEqual([]);
+  });
+  it("トランスペアレントモデル", () => {
+    // getContentModel("a");
+    const modelOfA = [
+      {
+        transparent:
+          ":not(:model(interactive), a, [tabindex], :has(:model(interactive), a, [tabindex]))",
+      },
+    ];
+    expect(getTransparentContentModel(modelOfA)).toEqual([
+      ":not(:model(interactive), a, [tabindex], :has(:model(interactive), a, [tabindex]))",
+    ]);
+  });
+
+  it("returns transparent content model", () => {
+    const modelOdVideo = [
+      {
+        zeroOrMore: "source",
+      },
+      {
+        zeroOrMore: "track",
+      },
+      {
+        transparent: ":not(audio, video, :has(audio, video))",
+      },
+    ];
+    expect(getTransparentContentModel(modelOdVideo)).toEqual([
+      ":not(audio, video, :has(audio, video))",
+    ]);
   });
 });
 
@@ -29,6 +69,10 @@ describe("checkNext", () => {
   });
   it("コンテンツモデルに適合しない要素が出せない", () => {
     expect(checkNext(["div", "p", "span"], "p")).toBe(false);
+  });
+  it("ulの中にliが入れられる", () => {
+    expect(checkNext(["ul"], "li")).toBe(true);
+    expect(checkNext(["body", "ul"], "li")).toBe(true);
   });
   describe("トランスペアレントモデル", () => {
     it("トランスペアレントモデルが処理される", () => {
