@@ -5,7 +5,7 @@ import { createSelector } from "@markuplint/selector";
 // TODO: ユニオン型にしたい
 export type ElementName = (typeof htmlSpec.specs)[number]["name"];
 
-export const getContentModel = (elementName: ElementName) => {
+const getContentModel = (elementName: ElementName) => {
   const name = elementName.toLowerCase();
   const spec = htmlSpec.specs.find((s) => s.name === name);
   return spec?.contentModel.contents;
