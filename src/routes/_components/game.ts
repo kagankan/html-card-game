@@ -17,7 +17,6 @@ export function isStringArray(
   return arr.every((item) => typeof item === "string");
 }
 
-// TODO: a > div > p > button が禁止されない aの子要素ルールが判定できてない
 const flattenContentPattern = (
   model: (typeof htmlSpec.specs)[number]["contentModel"]["contents"],
   lastQuery: string,
