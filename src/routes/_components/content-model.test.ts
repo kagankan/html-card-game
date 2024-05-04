@@ -4,7 +4,7 @@ import {
   formatHtml,
   getTransparentContentModel,
   isStringArray,
-} from "./game";
+} from "./content-model";
 
 describe("isStringArray", () => {
   it("returns true when all elements are strings", () => {
