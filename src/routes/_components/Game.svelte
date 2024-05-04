@@ -5,13 +5,45 @@
   import Card from "./Card.svelte";
   import { startMatch } from "./match";
 
-  let match = startMatch(
-    ["body", "div", "span", "a", "hr", "p", "button", "ul", "li", "br"],
-    1,
-  );
+  const DEFAULT_DECK: ElementName[] = [
+    "body",
+    "div",
+    "span",
+    "a",
+    "hr",
+    "p",
+    "button",
+    "ul",
+    "li",
+    "br",
+  ];
+  let match = startMatch(DEFAULT_DECK, 1);
 </script>
 
 <pre><code>{formatHtml(match.field, 2)}</code></pre>
+
+<p>
+  <button
+    class="mt-8 rounded-lg bg-blue-500 px-4 py-2 text-white"
+    on:click={() => {
+      match = startMatch(DEFAULT_DECK, 1);
+    }}
+  >
+    最初から
+  </button>
+
+  <button
+    class="mt-8 rounded-lg bg-blue-500 px-4 py-2 text-white"
+    on:click={() => {
+      match = {
+        ...match,
+        field: [],
+      };
+    }}
+  >
+    場をリセット
+  </button>
+</p>
 
 <ul class=" mt-8 grid auto-cols-auto grid-flow-col">
   <!-- for -->
