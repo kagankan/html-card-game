@@ -66,7 +66,7 @@
     {@const ok = browser ? checkNext(match.field, el) : false}
     <li class=" w-24 transition-transform hover:z-10 hover:-translate-y-4">
       <Card
-        title={el}
+        title={formatHtml([el])}
         description={el === "a" ? " (hrefなし)" : ""}
         onClick={() => {
           play(0, index);
