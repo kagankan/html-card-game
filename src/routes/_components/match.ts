@@ -8,6 +8,8 @@ type Match = Readonly<{
   field: readonly ElementName[];
   /** プレイヤーの手札 */
   players: readonly Hand[];
+  /** 捨て札 */
+  trash: readonly ElementName[];
 }>;
 
 export const startMatch = (
@@ -18,6 +20,7 @@ export const startMatch = (
   const players = deal(shuffled, playerCount);
   return {
     field: [],
+    trash: [],
     players,
   };
 };

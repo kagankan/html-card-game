@@ -1,7 +1,7 @@
 @import "@fontsource/fira-mono";
 
 @tailwind base;
-/* @tailwind components; */
+@tailwind components;
 @tailwind utilities;
 
 :root {
@@ -16,6 +16,9 @@
   --color-text: rgba(0, 0, 0, 0.7);
   --column-width: 42rem;
   --column-margin-top: 4rem;
+  --color-whatwg-green: #3c790a;
+  --color-html-1: #e54c21;
+  --color-html-2: #f16524;
   font-family: var(--font-body);
   color: var(--color-text);
 }

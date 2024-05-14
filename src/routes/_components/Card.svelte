@@ -1,21 +1,24 @@
 <script lang="ts">
   export let title = "";
   export let description = "";
-  export let onClick: () => void;
+  export let onClick: (() => void) | undefined = undefined;
   export let disabled = false;
 </script>
 
 <section
-  class="aspect-[58/89] w-40 rounded-lg shadow {disabled
+  class="relative isolate aspect-[58/89] w-40 rounded-lg shadow {disabled
     ? 'bg-gray-300'
     : 'bg-white'}"
 >
   <button
     type="button"
     on:click={onClick}
-    class="h-full w-full p-4 disabled:text-gray-500"
+    class=" h-full w-full p-4 disabled:text-gray-500"
     {disabled}
   >
+    <span class=" absolute left-0 top-full block origin-top-left -rotate-90"
+      >{title}</span
+    >
     <span class="text-3xl font-bold">{title}</span>
     {#if description}<span class="block">{description}</span>{/if}
   </button>

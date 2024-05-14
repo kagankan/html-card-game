@@ -7,13 +7,13 @@
 </script>
 
 <svelte:head>
-  <title>Home</title>
+  <title>HTML 大富豪</title>
   <meta name="description" content="Svelte demo app" />
 </svelte:head>
 
 <section>
   <h1>HTML 大富豪</h1>
-
+  <!-- <a href="/how-to-play">遊び方</a> -->
   <Game />
 
   <!-- <Card title="test" description="test description" /> -->
