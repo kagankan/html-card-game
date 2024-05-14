@@ -1,10 +1,14 @@
+<script>
+  import { base } from "$app/paths";
+</script>
+
 <svelte:head>
   <title>HTML大富豪の遊び方</title>
 </svelte:head>
 
 <article>
   <header>
-    <a href="/">戻る</a>
+    <a href="{base}/">戻る</a>
   </header>
   <h1>HTML 大富豪とは？</h1>
 

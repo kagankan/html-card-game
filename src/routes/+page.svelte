@@ -4,6 +4,8 @@
   import welcome_fallback from "$lib/images/svelte-welcome.png";
   import Card from "./_components/Card.svelte";
   import Game from "./_components/Game.svelte";
+
+  import { base } from "$app/paths";
 </script>
 
 <svelte:head>
@@ -13,7 +15,7 @@
 
 <section>
   <h1>HTML 大富豪</h1>
-  <!-- <a href="/how-to-play">遊び方</a> -->
+  <a hidden href="{base}/how-to-play">遊び方</a>
   <Game />
 
   <!-- <Card title="test" description="test description" /> -->
