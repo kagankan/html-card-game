@@ -13,10 +13,9 @@
   <meta name="description" content="Svelte demo app" />
 </svelte:head>
 
+<Game />
 <section>
-  <h1>HTML 大富豪</h1>
   <a hidden href="{base}/how-to-play">遊び方</a>
-  <Game />
 
   <!-- <Card title="test" description="test description" /> -->
   <!-- <Counter /> -->

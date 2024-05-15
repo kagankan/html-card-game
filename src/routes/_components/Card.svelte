@@ -1,12 +1,15 @@
 <script lang="ts">
-  export let title = "";
+  import type { ElementName } from "./constants";
+  import { formatHtml } from "./content-model";
+
+  export let element: ElementName;
   export let description = "";
   export let onClick: (() => void) | undefined = undefined;
   export let disabled = false;
 </script>
 
 <section
-  class="relative isolate aspect-[58/89] w-40 rounded-lg shadow {disabled
+  class="relative isolate aspect-[58/89] w-full rounded-lg shadow {disabled
     ? 'bg-gray-300'
     : 'bg-white'}"
 >
@@ -16,10 +19,8 @@
     class=" h-full w-full p-4 disabled:text-gray-500"
     {disabled}
   >
-    <span class=" absolute left-0 top-full block origin-top-left -rotate-90"
-      >{title}</span
-    >
-    <span class="text-3xl font-bold">{title}</span>
+    <span class=" absolute left-0 top-0">&lt;{element}&gt;</span>
+    <span class="text-3xl font-bold">{formatHtml([element])}</span>
     {#if description}<span class="block">{description}</span>{/if}
   </button>
   <!-- <ul class="Card__Categories">
