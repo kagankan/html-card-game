@@ -110,8 +110,7 @@
           <li class="min-w-0 last:flex-shrink-0">
             <div
               class="w-20"
-              style="transform: rotate({deg}deg) translateY(calc(sin({90 +
-                deg}deg) * -10rem + 9rem));"
+              style="transform: rotate({deg}deg) translateY(calc(cos({deg}deg) * -10rem + 9rem));"
             >
               <CardBack />
             </div>
