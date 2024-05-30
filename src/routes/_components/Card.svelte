@@ -6,21 +6,23 @@
   export let description = "";
   export let onClick: (() => void) | undefined = undefined;
   export let disabled = false;
+  export let selected = false;
 </script>
 
 <section
-  class="relative isolate aspect-[58/89] w-full rounded-lg shadow {disabled
+  class="relative isolate aspect-[58/89] w-full overflow-clip rounded-lg shadow {disabled
     ? 'bg-gray-300'
-    : 'bg-white'}"
+    : 'bg-white'} {selected ? 'border-4 border-blue-500' : ''}"
 >
   <button
     type="button"
     on:click={onClick}
-    class=" h-full w-full p-4 disabled:text-gray-500"
+    class=" h-full w-full p-2 disabled:text-gray-500"
     {disabled}
+    aria-pressed={selected}
   >
     <span class=" absolute left-0 top-0">&lt;{element}&gt;</span>
-    <span class="text-3xl font-bold">{formatHtml([element])}</span>
+    <span class="text-3xl font-bold">{element}</span>
     {#if description}<span class="block">{description}</span>{/if}
   </button>
   <!-- <ul class="Card__Categories">

@@ -27,17 +27,24 @@
     "li",
     "br",
   ];
-  let fieldMode: "card" | "tree" = "card";
   let match = startMatch(DEFAULT_DECK, 2);
   let turnPlayer: 0 | 1 = 0;
   let passedPlayers = { 0: false, 1: false };
   let wonPlayer: 0 | 1 | null = null;
+  let selectedCardIndex: number | null = null;
+  let infoChecked = false;
 
   $: {
     if (match.players[0].length === 0) {
       wonPlayer = 0;
     } else if (match.players[1].length === 0) {
       wonPlayer = 1;
+    }
+  }
+
+  $: {
+    if (wonPlayer !== null || turnPlayer === 0 || turnPlayer === 1) {
+      infoChecked = false;
     }
   }
 
@@ -121,31 +128,31 @@
   </section>
 
   <!-- 場 -->
-  <div class="Game__Field grid grid-rows-[1fr_auto] p-2">
-    {#if fieldMode === "card"}
-      <ul class=" flex justify-center">
-        {#each match.field as el, index}
-          <li class="min-w-0 max-w-6 last:max-w-none last:shrink-0">
-            <div class="w-24">
-              <Card
-                element={el}
-                description={el === "a" ? " (hrefなし)" : ""}
-              />
-            </div>
-          </li>
-        {/each}
-      </ul>
-    {:else}
-      <pre><code>{formatHtml(match.field, 2)}</code></pre>
-    {/if}
+  <div class="Game__Field relative grid grid-rows-[1fr_auto] p-2">
+    <ul class=" flex justify-center">
+      {#each match.field as el, index}
+        <li class="min-w-0 max-w-6 last:max-w-none last:shrink-0">
+          <div class="w-24">
+            <Card element={el} description={el === "a" ? " (hrefなし)" : ""} />
+          </div>
+        </li>
+      {/each}
+    </ul>
+    <pre
+      id="tree"
+      popover="auto"
+      class=" m-auto w-11/12 rounded bg-slate-50 p-2 shadow-md backdrop:bg-black backdrop:bg-opacity-40
+    "><code
+        >{match.field.length
+          ? formatHtml(match.field, 2)
+          : "場にカードがありません"}</code
+      ></pre>
     <p class="text-center">
       <button
+        popovertarget="tree"
         type="button"
-        on:click={() => {
-          fieldMode = fieldMode === "card" ? "tree" : "card";
-        }}
-        class="mt-4 rounded-lg bg-blue-500 px-4 py-2 text-white"
-        >表示切替</button
+        class="mt-4 rounded-lg bg-blue-500 px-4 py-2 text-sm text-white"
+        >ツリーを表示</button
       >
     </p>
   </div>
@@ -155,62 +162,107 @@
       {#each match.players[0] as el, index}
         {@const ok = browser ? checkNext(match.field, el) : false}
         <li
-          class="  min-w-0 transition-transform last:flex-shrink-0 hover:z-10 hover:-translate-y-4"
+          class="  min-w-0 transition-transform last:flex-shrink-0 hover:z-10 hover:-translate-y-4 {selectedCardIndex ===
+          index
+            ? 'z-10 -translate-y-4'
+            : ''}"
         >
           <div class="w-[min(10rem,30vw)]">
             <Card
               element={el}
               description={el === "a" ? " (hrefなし)" : ""}
               onClick={() => {
-                play(0, index);
-                turnPlayer = 1;
+                selectedCardIndex = index;
               }}
               disabled={!ok || turnPlayer === 1}
+              selected={selectedCardIndex === index}
             />
           </div>
         </li>
       {/each}
     </ul>
+
+    <p class="text-center">
+      <button
+        type="button"
+        on:click={() => {
+          if (selectedCardIndex !== null) {
+            play(0, selectedCardIndex);
+            selectedCardIndex = null;
+            turnPlayer = 1;
+          }
+        }}
+        class="mt-4 rounded-lg bg-blue-500 px-4 py-2 text-white
+disabled:bg-gray-300 disabled:text-gray-500"
+        disabled={selectedCardIndex === null || turnPlayer === 1}
+      >
+        カードを出す
+      </button>
+      <button
+        type="button"
+        on:click={() => {
+          selectedCardIndex = null;
+        }}
+        class="mt-4 rounded-lg bg-blue-500 px-4 py-2 text-white
+disabled:bg-gray-300 disabled:text-gray-500"
+        disabled={selectedCardIndex === null}
+      >
+        選択解除
+      </button>
+      <button
+        type="button"
+        on:click={pass}
+        class="mt-4 rounded-lg bg-blue-500 px-4 py-2 text-white
+disabled:bg-gray-300 disabled:text-gray-500"
+        disabled={turnPlayer === 1}>パス</button
+      >
+    </p>
   </div>
 
-  <section class="Game__Info w-full p-2">
-    <div class="rounded-lg bg-black bg-opacity-10 p-4 text-center">
-      {#if wonPlayer !== null}
-        <p>{wonPlayer === 0 ? "あなた" : "相手"}の勝ちです</p>
-        <button
-          class="mt-4 rounded-lg bg-blue-500 px-4 py-2 text-white"
-          on:click={() => {
-            match = startMatch(DEFAULT_DECK, 2);
-            turnPlayer = 0;
-            passedPlayers = { 0: false, 1: false };
-            wonPlayer = null;
-          }}
-        >
-          最初から
-        </button>
-      {:else if turnPlayer === 0}
-        <p>あなたのターンです</p>
-        <button
-          type="button"
-          on:click={pass}
-          class="mt-4 rounded-lg bg-blue-500 px-4 py-2 text-white
-    disabled:bg-gray-300 disabled:text-gray-500">パス</button
-        >
-      {:else}
-        <p>相手のターンです</p>
-        <p>相手が行動を選択します</p>
-        <button
-          type="button"
-          on:click={() => {
-            playCpu();
-          }}
-          class="mt-8 rounded-lg bg-blue-500 px-4 py-2 text-white
+  <section class="Game__Info z-10 w-full place-self-center p-2">
+    {#if !infoChecked}
+      <div class="rounded-lg bg-white p-4 text-center shadow-lg">
+        {#if wonPlayer !== null}
+          <p>{wonPlayer === 0 ? "あなた" : "相手"}の勝ちです</p>
+          <button
+            type="button"
+            class="mt-4 rounded-lg bg-blue-500 px-4 py-2 text-white"
+            on:click={() => {
+              match = startMatch(DEFAULT_DECK, 2);
+              turnPlayer = 0;
+              passedPlayers = { 0: false, 1: false };
+              wonPlayer = null;
+            }}
+          >
+            最初から
+          </button>
+        {:else if turnPlayer === 0}
+          <p>あなたのターンです</p>
+          <button
+            type="button"
+            on:click={() => {
+              infoChecked = true;
+            }}
+            class="mt-4 rounded-lg bg-blue-500 px-4 py-2 text-white
+          disabled:bg-gray-300 disabled:text-gray-500"
+          >
+            OK
+          </button>
+        {:else}
+          <p>相手のターンです</p>
+          <button
+            type="button"
+            on:click={() => {
+              playCpu();
+            }}
+            class="mt-4 rounded-lg bg-blue-500 px-4 py-2 text-white
         disabled:bg-gray-300 disabled:text-gray-500"
-        >
-          OK
-        </button>
-      {/if}
-    </div>
+          >
+            OK
+          </button>
+        {/if}
+      </div>
+    {/if}
   </section>
 </div>
 
@@ -224,12 +276,11 @@
       "Opponents" minmax(0, 1fr)
       "Field" minmax(0, 2fr)
       "Hands" minmax(0, 2fr)
-      "Info" minmax(0, 1fr)
       /
       minmax(0, 1fr);
   }
   .Game__Info {
-    grid-area: Info;
+    grid-area: 1 / 1 / -1 / -1;
   }
   .Game__Opponents {
     grid-area: Opponents;

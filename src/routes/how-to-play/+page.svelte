@@ -147,6 +147,14 @@
         background-color: #f6f7f8;
         border: 0.1rem solid var(--color-border);
         border-radius: 0.25rem;
+        // font-size: 16px;
+        // font-family: var(--font-mono);
+        // background-color: rgba(255, 255, 255, 0.45);
+        // border-radius: 3px;
+        // box-shadow: 2px 2px 6px rgb(255 255 255 / 25%);
+        // padding: 0.5em;
+        // overflow-x: auto;
+        // color: var(--color-text);
       }
     }
     &:where(kbd) {
