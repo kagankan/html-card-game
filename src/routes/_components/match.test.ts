@@ -13,15 +13,9 @@ describe("deal", () => {
     ]);
   });
 
-  it("カードが足りない場合、空の配列を持つプレイヤーがいる", () => {
+  it("カードが足りない場合、エラーを投げる（想定しない）", () => {
     const cards = ["card1", "card2", "card3"];
     const playerCount = 5;
-    expect(deal(cards, playerCount)).toEqual([
-      ["card1"],
-      ["card2"],
-      ["card3"],
-      [],
-      [],
-    ]);
+    expect(() => deal(cards, playerCount)).toThrowError();
   });
 });

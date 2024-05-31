@@ -31,6 +31,10 @@ const shuffle = <T>(array: readonly T[]): T[] => {
 
 // カードを人数分に配る
 export const deal = <T>(cards: readonly T[], playerCount: number): T[][] => {
+  if (cards.length < playerCount) {
+    console.log(cards.length, playerCount);
+    throw new Error("カードが足りません");
+  }
   const hands: T[][] = cards.reduce<T[][]>((acc, card, index) => {
     const playerIndex = index % playerCount;
     if (!acc[playerIndex]) {
