@@ -82,12 +82,28 @@ describe("checkNext", () => {
   describe("トランスペアレントモデル", () => {
     it("トランスペアレントモデルが処理される", () => {
       expect(checkNext(["a", "div", "p"], "button")).toBe(false);
-    });
-    it("トランスペアレントモデルが処理される", () => {
       expect(checkNext(["div", "a"], "div")).toBe(true);
-    });
-    it("トランスペアレントモデルが処理される", () => {
       expect(checkNext(["span", "a"], "div")).toBe(false);
+    });
+  });
+  describe("@markuplint/html-specで確認できないもの", () => {
+    it("bodyはhtml以外の中には入れられない", () => {
+      expect(checkNext([], "body")).toBe(true);
+      expect(checkNext(["html"], "body")).toBe(true);
+      expect(checkNext(["div"], "body")).toBe(false);
+      expect(checkNext(["a"], "body")).toBe(false);
+    });
+    it("headはhtml以外の中には入れられない", () => {
+      expect(checkNext([], "head")).toBe(true);
+      expect(checkNext(["html"], "head")).toBe(true);
+      expect(checkNext(["div"], "head")).toBe(false);
+      expect(checkNext(["a"], "head")).toBe(false);
+    });
+    it("htmlはルート以外には入れられない", () => {
+      expect(checkNext([], "html")).toBe(true);
+      expect(checkNext(["html"], "html")).toBe(false);
+      expect(checkNext(["div"], "html")).toBe(false);
+      expect(checkNext(["a"], "html")).toBe(false);
     });
   });
 });

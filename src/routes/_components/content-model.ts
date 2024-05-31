@@ -58,6 +58,14 @@ const flattenContentPattern = (
         }
       } else if ("transparent" in m) {
         return [`:is(${lastQuery}):is(${m.transparent})`];
+      } else if ("require" in m) {
+        if (typeof m.require === "string") {
+          return [m.require];
+        } else if (isStringArray(m.require)) {
+          return m.require;
+        } else {
+          return flattenContentPattern(m.require, lastQuery);
+        }
       }
       return [];
     });
@@ -77,6 +85,18 @@ export const checkNext = (
   if (parents.length === 0) {
     return true; //{ ok: true, queries: ["*"] };
   }
+
+  // @markuplint/html-specで判定できないものを特別対応
+  if (tagName === "html") {
+    return false;
+  }
+  if (tagName === "head") {
+    return parents.length === 1 && parents[0] === "html";
+  }
+  if (tagName === "body") {
+    return parents.length === 1 && parents[0] === "html";
+  }
+
   const element = document.createElement(tagName);
   console.log(element);
   console.log(parents);
