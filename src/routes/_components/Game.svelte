@@ -108,11 +108,13 @@
 
   // 場を流す
   const nextRound = (): void => {
-    match = {
-      ...match,
-      field: [],
-      trash: [...match.trash, ...match.field],
-    };
+    document.startViewTransition(() => {
+      match = {
+        ...match,
+        field: [],
+        trash: [...match.trash, ...match.field],
+      };
+    });
     passedPlayers = { 0: false, 1: false };
   };
 
@@ -179,7 +181,8 @@
   </section>
 
   <!-- 場 -->
-  <div class="Game__Field relative grid grid-rows-[1fr_auto] p-2">
+  <section class="Game__Field relative grid grid-rows-[1fr_auto] p-2">
+    <div />
     <ul class=" flex justify-center">
       {#each match.field as card, index}
         <li class="min-w-0 max-w-6 last:max-w-none last:shrink-0">
@@ -213,7 +216,22 @@
         >ツリーを表示</button
       >
     </p>
-  </div>
+  </section>
+  <section class="Game__Trash">
+    <section class="flex h-full items-center justify-center p-2">
+      <ul class=" flex w-16 justify-center">
+        {#each match.trash as card}
+          <li class="min-w-0 last:flex-shrink-0">
+            <div class="w-16">
+              <CardBack
+                style={`view-transition-name:card-${card.id}; contain: paint;`}
+              />
+            </div>
+          </li>
+        {/each}
+      </ul>
+    </section>
+  </section>
 
   <div class="Game__Hands">
     <ul class="mx-auto flex max-w-4xl justify-center">
@@ -340,11 +358,11 @@ disabled:bg-gray-300 disabled:text-gray-500"
 
     display: grid;
     grid-template:
-      "Opponents" minmax(0, 1fr)
-      "Field" minmax(0, 2fr)
-      "Hands" minmax(0, 2fr)
+      "Opponents Opponents Opponents" minmax(0, 1fr)
+      ". Field Trash" minmax(0, 2fr)
+      "Hands Hands Hands" minmax(0, 2fr)
       /
-      minmax(0, 1fr);
+      1fr minmax(0, 2fr) 1fr;
   }
   .Game__Info {
     grid-area: 1 / 1 / -1 / -1;
@@ -358,6 +376,9 @@ disabled:bg-gray-300 disabled:text-gray-500"
 
   .Game__Hands {
     grid-area: Hands;
+  }
+  .Game__Trash {
+    grid-area: Trash;
   }
 
   * {
