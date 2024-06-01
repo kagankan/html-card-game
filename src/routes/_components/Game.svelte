@@ -5,29 +5,51 @@
   import Card from "./Card.svelte";
   import { startMatch } from "./match";
   import CardBack from "./CardBack.svelte";
+  import DeckRecipeDialog from "./DeckRecipeDialog.svelte";
 
-  const DEFAULT_DECK: ElementName[] = [
+  /** このゲームで使えることにする要素 */
+  const ALLOWED_ELEMENTS = [
+    "html",
     "body",
+    "head",
     "div",
     "span",
     "a",
-    "hr",
     "p",
     "button",
     "ul",
     "li",
+    "hr",
     "br",
-    "ul",
-    "li",
-    "br",
-    "ul",
-    "li",
-    "br",
-    "ul",
-    "li",
-    "br",
-  ];
-  let match = startMatch(DEFAULT_DECK, 2);
+  ] as const;
+
+  const DEFAULT_DECK_RECIPE = {
+    body: 1,
+    div: 2,
+    span: 2,
+    a: 2,
+    hr: 2,
+    p: 2,
+    button: 2,
+    ul: 2,
+    li: 2,
+    br: 2,
+  } as const satisfies Partial<
+    Record<(typeof ALLOWED_ELEMENTS)[number], number>
+  >;
+  let deckRecipe: Partial<Record<ElementName, number>> = DEFAULT_DECK_RECIPE;
+
+  let deckRecipeDialogRef: DeckRecipeDialog;
+
+  const recipeToDeck = (
+    recipe: Partial<Record<ElementName, number>>,
+  ): ElementName[] => {
+    return (Object.entries(recipe) as [ElementName, number][]).flatMap(
+      ([element, count]) => Array.from({ length: count }, () => element),
+    );
+  };
+
+  let match = startMatch(recipeToDeck(deckRecipe), 2);
   let turnPlayer: 0 | 1 = 0;
   let passedPlayers = { 0: false, 1: false };
   let wonPlayer: 0 | 1 | null = null;
@@ -105,7 +127,29 @@
   }
 </script>
 
+<DeckRecipeDialog
+  bind:this={deckRecipeDialogRef}
+  allowedElements={ALLOWED_ELEMENTS}
+  defaultDeckRecipe={deckRecipe}
+  onSubmit={(value) => {
+    deckRecipe = value;
+    match = startMatch(recipeToDeck(value), 2);
+    turnPlayer = 0;
+    passedPlayers = { 0: false, 1: false };
+    wonPlayer = null;
+  }}
+/>
+
 <div class=" Game">
+  <button
+    type="button"
+    class="absolute right-2 top-2 rounded-lg bg-blue-500 px-4 py-2 text-white"
+    on:click={() => {
+      deckRecipeDialogRef.onOpen();
+    }}
+  >
+    使用するカードを選択
+  </button>
   <section class="Game__Opponents">
     <section
       class=" relative isolate max-w-sm rounded-lg bg-gray-50 bg-opacity-50 p-8"
@@ -251,7 +295,7 @@ disabled:bg-gray-300 disabled:text-gray-500"
             type="button"
             class="mt-4 rounded-lg bg-blue-500 px-4 py-2 text-white"
             on:click={() => {
-              match = startMatch(DEFAULT_DECK, 2);
+              match = startMatch(recipeToDeck(deckRecipe), 2);
               turnPlayer = 0;
               passedPlayers = { 0: false, 1: false };
               wonPlayer = null;
