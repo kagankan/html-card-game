@@ -21,17 +21,17 @@
     nav: 0,
     header: 0,
     footer: 0,
-    main: 0,
-    aside: 0,
-    section: 0,
-    article: 0,
+    main: 1,
+    aside: 1,
+    section: 1,
+    article: 1,
     h1: 1,
     h2: 1,
     script: 1,
     style: 1,
     // link: 1, // TODO: relの注釈を入れる必要がある
-    meta: 1,
-    title: 1,
+    meta: 0,
+    title: 0,
   } as const satisfies Partial<Record<ElementName, number>>;
   /** このゲームで使えることにする要素 */
   const ALLOWED_ELEMENTS = Object.keys(DEFAULT_DECK_RECIPE) as ElementName[];
