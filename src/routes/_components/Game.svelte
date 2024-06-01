@@ -7,36 +7,35 @@
   import CardBack from "./CardBack.svelte";
   import DeckRecipeDialog from "./DeckRecipeDialog.svelte";
 
-  /** このゲームで使えることにする要素 */
-  const ALLOWED_ELEMENTS = [
-    "html",
-    "body",
-    "head",
-    "div",
-    "span",
-    "a",
-    "p",
-    "button",
-    "ul",
-    "li",
-    "hr",
-    "br",
-  ] as const;
-
   const DEFAULT_DECK_RECIPE = {
     body: 1,
-    div: 2,
-    span: 2,
-    a: 2,
-    hr: 2,
-    p: 2,
-    button: 2,
-    ul: 2,
-    li: 2,
-    br: 2,
-  } as const satisfies Partial<
-    Record<(typeof ALLOWED_ELEMENTS)[number], number>
-  >;
+    div: 1,
+    span: 1,
+    a: 1,
+    hr: 1,
+    p: 1,
+    button: 1,
+    ul: 1,
+    li: 1,
+    br: 1,
+    nav: 0,
+    header: 0,
+    footer: 0,
+    main: 0,
+    aside: 0,
+    section: 0,
+    article: 0,
+    h1: 1,
+    h2: 1,
+    script: 1,
+    style: 1,
+    // link: 1, // TODO: relの注釈を入れる必要がある
+    meta: 1,
+    title: 1,
+  } as const satisfies Partial<Record<ElementName, number>>;
+  /** このゲームで使えることにする要素 */
+  const ALLOWED_ELEMENTS = Object.keys(DEFAULT_DECK_RECIPE) as ElementName[];
+
   let deckRecipe: Partial<Record<ElementName, number>> = DEFAULT_DECK_RECIPE;
 
   let deckRecipeDialogRef: DeckRecipeDialog;
