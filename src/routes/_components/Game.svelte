@@ -144,7 +144,7 @@
 <div class=" Game">
   <button
     type="button"
-    class="absolute right-2 top-2 rounded-lg bg-blue-500 px-4 py-2 text-white"
+    class="absolute right-2 top-2 z-10 rounded-lg bg-blue-500 px-4 py-2 text-white"
     on:click={() => {
       deckRecipeDialogRef.onOpen();
     }}
@@ -248,7 +248,7 @@
             ? 'z-10 -translate-y-4'
             : ''}"
         >
-          <div class="w-[min(10rem,30vw)]">
+          <div class="w-[min(10rem,24vw)]">
             <Card
               element={el}
               description={el === "a" ? " (hrefなし)" : ""}
