@@ -56,7 +56,7 @@
     const card = match.players[playerIndex][cardIndex];
     match = {
       ...match,
-      field: [...match.field, card],
+      field: [...match.field, card.element],
       players: newPlayers,
     };
   };
@@ -69,7 +69,7 @@
   const playCpu = (): void => {
     // 相手の番
     const nextCardIndex = match.players[1].findIndex((card) =>
-      checkNext(match.field, card),
+      checkNext(match.field, card.element),
     );
     if (nextCardIndex !== -1) {
       play(1, nextCardIndex);
@@ -163,7 +163,8 @@
 
   <div class="Game__Hands">
     <ul class="mx-auto flex max-w-4xl justify-center">
-      {#each match.players[0] as el, index}
+      {#each match.players[0] as card, index}
+        {@const el = card.element}
         {@const ok = browser ? checkNext(match.field, el) : false}
         <li
           class="  min-w-0 transition-transform last:flex-shrink-0 hover:z-10 hover:-translate-y-4 {selectedCardIndex ===
@@ -182,7 +183,7 @@
               selected={selectedCardIndex === index}
               style={selectedCardIndex === index
                 ? `view-transition-name:card${match.field.length}; contain: paint;`
-                : `view-transition-name:card-hand-${index}; contain: paint;`}
+                : `view-transition-name:card-hand-${card.id}; contain: paint;`}
             />
           </div>
         </li>
@@ -307,6 +308,6 @@ disabled:bg-gray-300 disabled:text-gray-500"
   }
 
   :root::view-transition-group(*) {
-    animation-duration: 2s;
+    animation-duration: 1s;
   }
 </style>

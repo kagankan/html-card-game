@@ -1,7 +1,8 @@
 import type { ElementName } from "./constants";
+import { uuid } from "./id";
 
 /** 手札 */
-type Hand = readonly ElementName[];
+type Hand = readonly Readonly<{ element: ElementName; id: string }>[];
 
 type Match = Readonly<{
   /** 場に出されたカード */
@@ -17,11 +18,13 @@ export const startMatch = (
   playerCount: number,
 ): Match => {
   const shuffled = shuffle(deck);
-  const players = deal(shuffled, playerCount);
+  const hands = deal(shuffled, playerCount);
   return {
     field: [],
     trash: [],
-    players,
+    players: hands.map((hand) =>
+      hand.map((element) => ({ element, id: uuid() })),
+    ),
   };
 };
 
