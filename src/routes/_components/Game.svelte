@@ -54,19 +54,12 @@
   let passedPlayers = { 0: false, 1: false };
   let wonPlayer: 0 | 1 | null = null;
   let selectedCardIndex: number | null = null;
-  let infoChecked = false;
 
   $: {
     if (match.players[0].length === 0) {
       wonPlayer = 0;
     } else if (match.players[1].length === 0) {
       wonPlayer = 1;
-    }
-  }
-
-  $: {
-    if (wonPlayer !== null || turnPlayer === 0 || turnPlayer === 1) {
-      infoChecked = false;
     }
   }
 
@@ -105,6 +98,12 @@
       pass();
     }
   };
+
+  $: {
+    if (turnPlayer === 1) {
+      setTimeout(playCpu, 1000);
+    }
+  }
 
   // 場を流す
   const nextRound = (): void => {
@@ -305,47 +304,21 @@ disabled:bg-gray-300 disabled:text-gray-500"
   </div>
 
   <section class="Game__Info z-10 w-full place-self-center p-2">
-    {#if !infoChecked}
+    {#if wonPlayer !== null}
       <div class="rounded-lg bg-white p-4 text-center shadow-lg">
-        {#if wonPlayer !== null}
-          <p>{wonPlayer === 0 ? "あなた" : "相手"}の勝ちです</p>
-          <button
-            type="button"
-            class="mt-4 rounded-lg bg-blue-500 px-4 py-2 text-white"
-            on:click={() => {
-              match = startMatch(recipeToDeck(deckRecipe), 2);
-              turnPlayer = 0;
-              passedPlayers = { 0: false, 1: false };
-              wonPlayer = null;
-            }}
-          >
-            最初から
-          </button>
-        {:else if turnPlayer === 0}
-          <p>あなたのターンです</p>
-          <button
-            type="button"
-            on:click={() => {
-              infoChecked = true;
-            }}
-            class="mt-4 rounded-lg bg-blue-500 px-4 py-2 text-white
-          disabled:bg-gray-300 disabled:text-gray-500"
-          >
-            OK
-          </button>
-        {:else}
-          <p>相手のターンです</p>
-          <button
-            type="button"
-            on:click={() => {
-              playCpu();
-            }}
-            class="mt-4 rounded-lg bg-blue-500 px-4 py-2 text-white
-        disabled:bg-gray-300 disabled:text-gray-500"
-          >
-            OK
-          </button>
-        {/if}
+        <p>{wonPlayer === 0 ? "あなた" : "相手"}の勝ちです</p>
+        <button
+          type="button"
+          class="mt-4 rounded-lg bg-blue-500 px-4 py-2 text-white"
+          on:click={() => {
+            match = startMatch(recipeToDeck(deckRecipe), 2);
+            turnPlayer = 0;
+            passedPlayers = { 0: false, 1: false };
+            wonPlayer = null;
+          }}
+        >
+          最初から
+        </button>
       </div>
     {/if}
   </section>
@@ -386,6 +359,6 @@ disabled:bg-gray-300 disabled:text-gray-500"
   }
 
   :root::view-transition-group(*) {
-    animation-duration: 1s;
+    animation-duration: 0.5s;
   }
 </style>
