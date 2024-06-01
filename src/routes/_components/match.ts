@@ -1,23 +1,25 @@
 import type { ElementName } from "./constants";
 import { uuid } from "./id";
 
+type Card = Readonly<{ element: ElementName; id: string }>;
+
 /** 手札 */
-type Hand = readonly Readonly<{ element: ElementName; id: string }>[];
+type Hand = readonly Card[];
 
 type Match = Readonly<{
   /** 場に出されたカード */
-  field: readonly ElementName[];
+  field: readonly Card[];
   /** プレイヤーの手札 */
   players: readonly Hand[];
   /** 捨て札 */
-  trash: readonly ElementName[];
+  trash: readonly Card[];
 }>;
 
 export const startMatch = (
-  deck: readonly ElementName[],
+  elements: readonly ElementName[],
   playerCount: number,
 ): Match => {
-  const shuffled = shuffle(deck);
+  const shuffled = shuffle(elements);
   const hands = deal(shuffled, playerCount);
   return {
     field: [],

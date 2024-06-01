@@ -56,7 +56,7 @@
     const card = match.players[playerIndex][cardIndex];
     match = {
       ...match,
-      field: [...match.field, card.element],
+      field: [...match.field, card],
       players: newPlayers,
     };
   };
@@ -69,10 +69,15 @@
   const playCpu = (): void => {
     // 相手の番
     const nextCardIndex = match.players[1].findIndex((card) =>
-      checkNext(match.field, card.element),
+      checkNext(
+        match.field.map((card) => card.element),
+        card.element,
+      ),
     );
     if (nextCardIndex !== -1) {
-      play(1, nextCardIndex);
+      document.startViewTransition(() => {
+        play(1, nextCardIndex);
+      });
       turnPlayer = 0;
     } else {
       pass();
@@ -112,14 +117,16 @@
         <p>残り {match.players[1].length}枚</p>
       </div>
       <ul class=" flex justify-center">
-        {#each match.players[1] as el, index}
+        {#each match.players[1] as card, index}
           {@const deg = (index - (match.players[1].length - 1) / 2) * 5}
           <li class="min-w-0 last:flex-shrink-0">
             <div
               class="w-20"
               style="transform: rotate({deg}deg) translateY(calc(cos({deg}deg) * -10rem + 9rem));"
             >
-              <CardBack />
+              <CardBack
+                style={`view-transition-name:card-${card.id}; contain: paint;`}
+              />
             </div>
           </li>
         {/each}
@@ -130,13 +137,13 @@
   <!-- 場 -->
   <div class="Game__Field relative grid grid-rows-[1fr_auto] p-2">
     <ul class=" flex justify-center">
-      {#each match.field as el, index}
+      {#each match.field as card, index}
         <li class="min-w-0 max-w-6 last:max-w-none last:shrink-0">
           <div class="w-24">
             <Card
-              element={el}
-              description={el === "a" ? " (hrefなし)" : ""}
-              style="view-transition-name:card{index}; contain: paint;"
+              element={card.element}
+              description={card.element === "a" ? " (hrefなし)" : ""}
+              style="view-transition-name:card-{card.id}; contain: paint;"
             />
           </div>
         </li>
@@ -148,7 +155,10 @@
       class=" m-auto w-11/12 rounded bg-slate-50 p-2 shadow-md backdrop:bg-black backdrop:bg-opacity-40
     "><code
         >{match.field.length
-          ? formatHtml(match.field, 2)
+          ? formatHtml(
+              match.field.map((card) => card.element),
+              2,
+            )
           : "場にカードがありません"}</code
       ></pre>
     <p class="text-center">
@@ -165,7 +175,12 @@
     <ul class="mx-auto flex max-w-4xl justify-center">
       {#each match.players[0] as card, index}
         {@const el = card.element}
-        {@const ok = browser ? checkNext(match.field, el) : false}
+        {@const ok = browser
+          ? checkNext(
+              match.field.map((card) => card.element),
+              el,
+            )
+          : false}
         <li
           class="  min-w-0 transition-transform last:flex-shrink-0 hover:z-10 hover:-translate-y-4 {selectedCardIndex ===
           index
@@ -181,9 +196,7 @@
               }}
               disabled={!ok || turnPlayer === 1}
               selected={selectedCardIndex === index}
-              style={selectedCardIndex === index
-                ? `view-transition-name:card${match.field.length}; contain: paint;`
-                : `view-transition-name:card-hand-${card.id}; contain: paint;`}
+              style={`view-transition-name:card-${card.id}; contain: paint;`}
             />
           </div>
         </li>
