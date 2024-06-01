@@ -29,9 +29,10 @@
     h2: 1,
     script: 1,
     style: 1,
-    // link: 1, // TODO: relの注釈を入れる必要がある
     meta: 0,
     title: 0,
+    // link: 1, // TODO: relの注釈を入れる必要がある
+    // #text // TODO: テキストノードの扱い
   } as const satisfies Partial<Record<ElementName, number>>;
   /** このゲームで使えることにする要素 */
   const ALLOWED_ELEMENTS = Object.keys(DEFAULT_DECK_RECIPE) as ElementName[];
