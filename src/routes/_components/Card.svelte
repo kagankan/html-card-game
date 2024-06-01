@@ -7,12 +7,14 @@
   export let onClick: (() => void) | undefined = undefined;
   export let disabled = false;
   export let selected = false;
+  export let style: string | undefined = undefined;
 </script>
 
 <section
   class="relative isolate aspect-[58/89] w-full overflow-clip rounded-lg shadow {disabled
     ? 'bg-gray-300'
     : 'bg-white'} {selected ? 'border-4 border-blue-500' : ''}"
+  {style}
 >
   <button
     type="button"

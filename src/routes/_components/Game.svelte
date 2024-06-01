@@ -133,7 +133,11 @@
       {#each match.field as el, index}
         <li class="min-w-0 max-w-6 last:max-w-none last:shrink-0">
           <div class="w-24">
-            <Card element={el} description={el === "a" ? " (hrefなし)" : ""} />
+            <Card
+              element={el}
+              description={el === "a" ? " (hrefなし)" : ""}
+              style="view-transition-name:card{index}; contain: paint;"
+            />
           </div>
         </li>
       {/each}
@@ -176,6 +180,9 @@
               }}
               disabled={!ok || turnPlayer === 1}
               selected={selectedCardIndex === index}
+              style={selectedCardIndex === index
+                ? `view-transition-name:card${match.field.length}; contain: paint;`
+                : `view-transition-name:card-hand-${index}; contain: paint;`}
             />
           </div>
         </li>
@@ -186,11 +193,13 @@
       <button
         type="button"
         on:click={() => {
-          if (selectedCardIndex !== null) {
-            play(0, selectedCardIndex);
-            selectedCardIndex = null;
-            turnPlayer = 1;
-          }
+          document.startViewTransition(() => {
+            if (selectedCardIndex !== null) {
+              play(0, selectedCardIndex);
+              selectedCardIndex = null;
+              turnPlayer = 1;
+            }
+          });
         }}
         class="mt-4 rounded-lg bg-blue-500 px-4 py-2 text-white
 disabled:bg-gray-300 disabled:text-gray-500"
@@ -295,5 +304,9 @@ disabled:bg-gray-300 disabled:text-gray-500"
 
   * {
     min-width: 0;
+  }
+
+  :root::view-transition-group(*) {
+    animation-duration: 2s;
   }
 </style>
