@@ -155,8 +155,9 @@
     <section
       class=" relative isolate max-w-sm rounded-lg bg-gray-50 bg-opacity-50 p-8"
     >
+      <!-- https://www.nicchan.me/blog/view-transitions-and-stacking-context/ -->
       <div
-        class=" absolute inset-0 z-10 m-auto size-fit rounded-sm bg-slate-100 p-2"
+        class=" absolute inset-0 z-10 m-auto size-fit rounded-sm bg-slate-100 p-2 [view-transition-name:player-label-1]"
       >
         <p>CPU 1</p>
         <p>残り {match.players[1].length}枚</p>
@@ -359,6 +360,9 @@ disabled:bg-gray-300 disabled:text-gray-500"
   }
 
   :root::view-transition-group(*) {
-    animation-duration: 0.5s;
+    animation-duration: 10s;
+  }
+  :root::view-transition-new(root) {
+    z-index: -1;
   }
 </style>
