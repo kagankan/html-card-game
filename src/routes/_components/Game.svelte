@@ -64,16 +64,18 @@
   }
 
   const play = (playerIndex: number, cardIndex: number): void => {
-    const newPlayers = [...match.players];
-    newPlayers[playerIndex] = newPlayers[playerIndex].filter(
-      (_, index) => index !== cardIndex,
-    );
-    const card = match.players[playerIndex][cardIndex];
-    match = {
-      ...match,
-      field: [...match.field, card],
-      players: newPlayers,
-    };
+    document.startViewTransition(() => {
+      const newPlayers = [...match.players];
+      newPlayers[playerIndex] = newPlayers[playerIndex].filter(
+        (_, index) => index !== cardIndex,
+      );
+      const card = match.players[playerIndex][cardIndex];
+      match = {
+        ...match,
+        field: [...match.field, card],
+        players: newPlayers,
+      };
+    });
   };
 
   const pass = (): void => {
@@ -90,9 +92,7 @@
       ),
     );
     if (nextCardIndex !== -1) {
-      document.startViewTransition(() => {
-        play(1, nextCardIndex);
-      });
+      play(1, nextCardIndex);
       turnPlayer = 0;
     } else {
       pass();
@@ -151,9 +151,11 @@
   >
     使用するカードを選択
   </button>
+
+  <!-- 相手 -->
   <section class="Game__Opponents">
     <section
-      class=" relative isolate max-w-sm rounded-lg bg-gray-50 bg-opacity-50 p-8"
+      class=" relative isolate z-20 max-w-sm rounded-lg bg-gray-50 bg-opacity-50 p-8"
     >
       <!-- https://www.nicchan.me/blog/view-transitions-and-stacking-context/ -->
       <div
@@ -217,7 +219,9 @@
       >
     </p>
   </section>
-  <section class="Game__Trash">
+
+  <!-- 捨て札 -->
+  <section class="Game__Trash -z-10">
     <section class="flex h-full items-center justify-center p-2">
       <ul class=" flex w-16 justify-center">
         {#each match.trash as card}
@@ -269,13 +273,12 @@
       <button
         type="button"
         on:click={() => {
-          document.startViewTransition(() => {
-            if (selectedCardIndex !== null) {
-              play(0, selectedCardIndex);
-              selectedCardIndex = null;
-              turnPlayer = 1;
-            }
-          });
+          if (selectedCardIndex !== null) {
+            const cardIndexToPlay = selectedCardIndex;
+            selectedCardIndex = null;
+            play(0, cardIndexToPlay);
+            turnPlayer = 1;
+          }
         }}
         class="mt-4 rounded-lg bg-blue-500 px-4 py-2 text-white
 disabled:bg-gray-300 disabled:text-gray-500"
@@ -360,9 +363,21 @@ disabled:bg-gray-300 disabled:text-gray-500"
   }
 
   :root::view-transition-group(*) {
-    animation-duration: 10s;
+    animation-duration: 1s;
   }
-  :root::view-transition-new(root) {
+  /* トランジション中のみ前後を指定したい場合はこうする */
+  /* :global(::view-transition-group(player-label-1)) {
     z-index: -1;
+  } */
+  /* 移動のトランジションはgroupに対してかかっている */
+  /* :global(::view-transition-group(*)) {
+    animation: none;
+  } */
+  /* クロスフェードはold,newに対してかかっている */
+  :global(::view-transition-old(*)) {
+    animation: none;
+  }
+  :global(::view-transition-new(*)) {
+    animation: none;
   }
 </style>
