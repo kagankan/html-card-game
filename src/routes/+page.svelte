@@ -9,7 +9,7 @@
 </script>
 
 <svelte:head>
-  <title>HTML 大富豪</title>
+  <title>HTML 大富豪（ベータ）</title>
   <meta name="description" content="Svelte demo app" />
 </svelte:head>
 
