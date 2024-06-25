@@ -6,6 +6,14 @@
   import { startMatch } from "./match";
   import CardBack from "./CardBack.svelte";
   import DeckRecipeDialog from "./DeckRecipeDialog.svelte";
+  import { isSoundEnabledStore, playSound } from "../_modules/snd";
+  import Snd from "snd-lib";
+  import { get } from "svelte/store";
+
+  let isSoundEnabled: boolean;
+  isSoundEnabledStore.subscribe((value) => {
+    isSoundEnabled = value;
+  });
 
   const DEFAULT_DECK_RECIPE = {
     body: 1,
@@ -152,6 +160,19 @@
     使用するカードを選択
   </button>
 
+  <button
+    type="button"
+    class="absolute right-2 top-16 z-10 rounded-lg bg-blue-500 px-4 py-2 text-white"
+    on:click={() => {
+      isSoundEnabledStore.update((prev) => !prev);
+    }}
+    >{#if isSoundEnabled}
+      音を無効にする
+    {:else}
+      音を有効にする
+    {/if}
+  </button>
+
   <!-- 相手 -->
   <section class="Game__Opponents">
     <section
@@ -259,6 +280,7 @@
               description={el === "a" ? " (hrefなし)" : ""}
               onClick={() => {
                 selectedCardIndex = index;
+                playSound(Snd.SOUNDS.SELECT);
               }}
               disabled={!ok || turnPlayer === 1}
               selected={selectedCardIndex === index}
@@ -277,6 +299,7 @@
             const cardIndexToPlay = selectedCardIndex;
             selectedCardIndex = null;
             play(0, cardIndexToPlay);
+            playSound(Snd.SOUNDS.SWIPE);
             turnPlayer = 1;
           }
         }}
