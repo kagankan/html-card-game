@@ -1,3 +1,4 @@
+import { CSSProperties } from "react";
 import type { ElementName } from "./constants";
 
 interface CardProps {
@@ -6,7 +7,7 @@ interface CardProps {
   onClick?: () => void;
   disabled?: boolean;
   selected?: boolean;
-  style?: string;
+  style?: CSSProperties;
 }
 
 export default function Card({
@@ -22,7 +23,7 @@ export default function Card({
       className={`relative isolate aspect-[58/89] w-full overflow-clip rounded-lg shadow ${
         disabled ? "bg-gray-300" : "bg-white"
       } ${selected ? "border-4 border-blue-500" : ""}`}
-      style={style ? { viewTransitionName: style } : undefined}
+      style={style }
     >
       <button
         type="button"

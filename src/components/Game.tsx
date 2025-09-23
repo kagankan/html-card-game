@@ -232,7 +232,7 @@ export default function Game() {
                         transform: `rotate(${deg}deg) translateY(calc(cos(${deg}deg) * -10rem + 9rem))`,
                       }}
                     >
-                      <CardBack style={`view-transition-name:card-${card.id}; contain: paint;`} />
+                      <CardBack style={{"viewTransitionName": `card-${card.id}`, contain: "paint"}} />
                     </div>
                   </li>
                 );
@@ -251,7 +251,7 @@ export default function Game() {
                   <Card
                     element={card.element}
                     description={card.element === 'a' ? ' (hrefなし)' : ''}
-                    style={`view-transition-name:card-${card.id}; contain: paint;`}
+                    style={{"viewTransitionName": `card-${card.id}`, contain: "paint"}}
                   />
                 </div>
               </li>
@@ -298,7 +298,7 @@ export default function Game() {
               {match.trash.map((card, index) => (
                 <li key={`trash-${card.id}-${index}`} className="min-w-0 last:flex-shrink-0">
                   <div className="w-16">
-                    <CardBack style={`view-transition-name:card-${card.id}; contain: paint;`} />
+                    <CardBack style={{"viewTransitionName": `card-${card.id}`, contain: "paint"}} />
                   </div>
                 </li>
               ))}
@@ -328,7 +328,7 @@ export default function Game() {
                       onClick={() => handleCardClick(index)}
                       disabled={!ok || turnPlayer === 1}
                       selected={selectedCardIndex === index}
-                      style={`view-transition-name:card-${card.id}; contain: paint;`}
+                      style={{"viewTransitionName": `card-${card.id}`, contain: "paint"}}
                     />
                   </div>
                 </li>
