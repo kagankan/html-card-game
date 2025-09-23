@@ -3,7 +3,8 @@ import Snd from "snd-lib";
 let snd: Snd;
 let isSoundLoaded = false;
 
-// Simple store implementation for React
+// Svelte のstoreを移植したもの
+// TODO: Jotaiとか作ったほうがシンプルな気がする
 type Subscriber<T> = (value: T) => void;
 
 class SimpleStore<T> {

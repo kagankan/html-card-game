@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect, useRef } from 'react';
-import { checkNext, formatHtml } from './content-model';
-import type { ElementName } from './constants';
-import Card from './Card';
-import { startMatch } from './match';
-import CardBack from './CardBack';
-import DeckRecipeDialog, { type DeckRecipeDialogRef } from './DeckRecipeDialog';
-import { isSoundEnabledStore, playSound } from '../lib/_modules/snd';
-import Snd from 'snd-lib';
+import React, { useState, useEffect, useRef } from "react";
+import { checkNext, formatHtml } from "./content-model";
+import type { ElementName } from "./constants";
+import Card from "./Card";
+import { startMatch } from "./match";
+import CardBack from "./CardBack";
+import DeckRecipeDialog, { type DeckRecipeDialogRef } from "./DeckRecipeDialog";
+import { isSoundEnabledStore, playSound } from "../lib/_modules/snd";
+import Snd from "snd-lib";
 
 const DEFAULT_DECK_RECIPE = {
   body: 1,
@@ -38,20 +38,59 @@ const DEFAULT_DECK_RECIPE = {
 
 const ALLOWED_ELEMENTS = Object.keys(DEFAULT_DECK_RECIPE) as ElementName[];
 
-const recipeToDeck = (recipe: Partial<Record<ElementName, number>>): ElementName[] => {
-  return (Object.entries(recipe) as [ElementName, number][]).flatMap(([element, count]) =>
-    Array.from({ length: count }, () => element)
+const recipeToDeck = (
+  recipe: Partial<Record<ElementName, number>>,
+): ElementName[] => {
+  return (Object.entries(recipe) as [ElementName, number][]).flatMap(
+    ([element, count]) => Array.from({ length: count }, () => element),
   );
 };
 
 export default function Game() {
+  const [deckRecipe, setDeckRecipe] =
+    useState<Partial<Record<ElementName, number>>>(DEFAULT_DECK_RECIPE);
+  const [match, setMatch] = useState<ReturnType<typeof startMatch> | null>(
+    null,
+  );
+
+  useEffect(() => {
+    setMatch(startMatch(recipeToDeck(deckRecipe), 2));
+  }, [deckRecipe]);
+
+  if (!match) {
+    return <div>Loading...</div>;
+  }
+
+  return (
+    <GameInner
+      initialMatch={match}
+      deckRecipe={deckRecipe}
+      setDeckRecipe={setDeckRecipe}
+    />
+  );
+}
+
+function GameInner({
+  initialMatch,
+  deckRecipe,
+  setDeckRecipe,
+}: {
+  initialMatch: ReturnType<typeof startMatch>;
+  deckRecipe: Partial<Record<ElementName, number>>;
+  setDeckRecipe: React.Dispatch<
+    React.SetStateAction<Partial<Record<ElementName, number>>>
+  >;
+}) {
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
-  const [deckRecipe, setDeckRecipe] = useState<Partial<Record<ElementName, number>>>(DEFAULT_DECK_RECIPE);
-  const [match, setMatch] = useState(() => startMatch(recipeToDeck(DEFAULT_DECK_RECIPE), 2));
+
+  const [match, setMatch] =
+    useState<ReturnType<typeof startMatch>>(initialMatch);
   const [turnPlayer, setTurnPlayer] = useState<0 | 1>(0);
   const [passedPlayers, setPassedPlayers] = useState({ 0: false, 1: false });
   const [wonPlayer, setWonPlayer] = useState<0 | 1 | null>(null);
-  const [selectedCardIndex, setSelectedCardIndex] = useState<number | null>(null);
+  const [selectedCardIndex, setSelectedCardIndex] = useState<number | null>(
+    null,
+  );
   const [isTreeVisible, setIsTreeVisible] = useState(false);
 
   const deckRecipeDialogRef = useRef<DeckRecipeDialogRef>(null);
@@ -83,7 +122,10 @@ export default function Game() {
 
   // Auto next round logic
   useEffect(() => {
-    if ((turnPlayer === 0 && passedPlayers[1]) || (turnPlayer === 1 && passedPlayers[0])) {
+    if (
+      (turnPlayer === 0 && passedPlayers[1]) ||
+      (turnPlayer === 1 && passedPlayers[0])
+    ) {
       nextRound();
     }
   }, [turnPlayer, passedPlayers]);
@@ -100,7 +142,9 @@ export default function Game() {
 
   const performPlay = (playerIndex: number, cardIndex: number): void => {
     const newPlayers = [...match.players];
-    newPlayers[playerIndex] = newPlayers[playerIndex].filter((_, index) => index !== cardIndex);
+    newPlayers[playerIndex] = newPlayers[playerIndex].filter(
+      (_, index) => index !== cardIndex,
+    );
     const card = match.players[playerIndex][cardIndex];
     setMatch({
       ...match,
@@ -118,8 +162,8 @@ export default function Game() {
     const nextCardIndex = match.players[1].findIndex((card) =>
       checkNext(
         match.field.map((card) => card.element),
-        card.element
-      )
+        card.element,
+      ),
     );
     if (nextCardIndex !== -1) {
       play(1, nextCardIndex);
@@ -148,7 +192,9 @@ export default function Game() {
     setPassedPlayers({ 0: false, 1: false });
   };
 
-  const handleDeckRecipeSubmit = (value: Partial<Record<ElementName, number>>) => {
+  const handleDeckRecipeSubmit = (
+    value: Partial<Record<ElementName, number>>,
+  ) => {
     setDeckRecipe(value);
     setMatch(startMatch(recipeToDeck(value), 2));
     setTurnPlayer(0);
@@ -211,7 +257,7 @@ export default function Game() {
             isSoundEnabledStore.update((prev) => !prev);
           }}
         >
-          {isSoundEnabled ? '音を無効にする' : '音を有効にする'}
+          {isSoundEnabled ? "音を無効にする" : "音を有効にする"}
         </button>
 
         {/* 相手 */}
@@ -232,7 +278,12 @@ export default function Game() {
                         transform: `rotate(${deg}deg) translateY(calc(cos(${deg}deg) * -10rem + 9rem))`,
                       }}
                     >
-                      <CardBack style={{"viewTransitionName": `card-${card.id}`, contain: "paint"}} />
+                      <CardBack
+                        style={{
+                          viewTransitionName: `card-${card.id}`,
+                          contain: "paint",
+                        }}
+                      />
                     </div>
                   </li>
                 );
@@ -246,12 +297,18 @@ export default function Game() {
           <div />
           <ul className="flex justify-center">
             {match.field.map((card, index) => (
-              <li key={`${card.id}-${index}`} className="min-w-0 max-w-6 last:max-w-none last:shrink-0">
+              <li
+                key={`${card.id}-${index}`}
+                className="min-w-0 max-w-6 last:max-w-none last:shrink-0"
+              >
                 <div className="w-24">
                   <Card
                     element={card.element}
-                    description={card.element === 'a' ? ' (hrefなし)' : ''}
-                    style={{"viewTransitionName": `card-${card.id}`, contain: "paint"}}
+                    description={card.element === "a" ? " (hrefなし)" : ""}
+                    style={{
+                      viewTransitionName: `card-${card.id}`,
+                      contain: "paint",
+                    }}
                   />
                 </div>
               </li>
@@ -265,9 +322,9 @@ export default function Game() {
                     {match.field.length
                       ? formatHtml(
                           match.field.map((card) => card.element),
-                          2
+                          2,
                         )
-                      : '場にカードがありません'}
+                      : "場にカードがありません"}
                   </code>
                 </pre>
                 <button
@@ -296,9 +353,17 @@ export default function Game() {
           <section className="flex h-full items-center justify-center p-2">
             <ul className="flex w-16 justify-center">
               {match.trash.map((card, index) => (
-                <li key={`trash-${card.id}-${index}`} className="min-w-0 last:flex-shrink-0">
+                <li
+                  key={`trash-${card.id}-${index}`}
+                  className="min-w-0 last:flex-shrink-0"
+                >
                   <div className="w-16">
-                    <CardBack style={{"viewTransitionName": `card-${card.id}`, contain: "paint"}} />
+                    <CardBack
+                      style={{
+                        viewTransitionName: `card-${card.id}`,
+                        contain: "paint",
+                      }}
+                    />
                   </div>
                 </li>
               ))}
@@ -312,23 +377,26 @@ export default function Game() {
               const el = card.element;
               const ok = checkNext(
                 match.field.map((card) => card.element),
-                el
+                el,
               );
               return (
                 <li
                   key={card.id}
                   className={`min-w-0 transition-transform last:flex-shrink-0 hover:z-10 hover:-translate-y-4 ${
-                    selectedCardIndex === index ? 'z-10 -translate-y-4' : ''
+                    selectedCardIndex === index ? "z-10 -translate-y-4" : ""
                   }`}
                 >
                   <div className="w-[min(10rem,24vw)]">
                     <Card
                       element={el}
-                      description={el === 'a' ? ' (hrefなし)' : ''}
+                      description={el === "a" ? " (hrefなし)" : ""}
                       onClick={() => handleCardClick(index)}
                       disabled={!ok || turnPlayer === 1}
                       selected={selectedCardIndex === index}
-                      style={{"viewTransitionName": `card-${card.id}`, contain: "paint"}}
+                      style={{
+                        viewTransitionName: `card-${card.id}`,
+                        contain: "paint",
+                      }}
                     />
                   </div>
                 </li>
@@ -367,7 +435,7 @@ export default function Game() {
         <section className="Game__Info z-10 w-full place-self-center p-2">
           {wonPlayer !== null && (
             <div className="rounded-lg bg-white p-4 text-center shadow-lg">
-              <p>{wonPlayer === 0 ? 'あなた' : '相手'}の勝ちです</p>
+              <p>{wonPlayer === 0 ? "あなた" : "相手"}の勝ちです</p>
               <button
                 type="button"
                 className="mt-4 rounded-lg bg-blue-500 px-4 py-2 text-white"
@@ -386,9 +454,9 @@ export default function Game() {
           inset: 0;
           display: grid;
           grid-template:
-            'Opponents Opponents Opponents' minmax(0, 1fr)
-            '. Field Trash' minmax(0, 2fr)
-            'Hands Hands Hands' minmax(0, 2fr) / 1fr minmax(0, 2fr) 1fr;
+            "Opponents Opponents Opponents" minmax(0, 1fr)
+            ". Field Trash" minmax(0, 2fr)
+            "Hands Hands Hands" minmax(0, 2fr) / 1fr minmax(0, 2fr) 1fr;
         }
         .Game__Info {
           grid-area: 1 / 1 / -1 / -1;
