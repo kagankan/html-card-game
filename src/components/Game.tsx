@@ -9,6 +9,7 @@ import CardBack from "./CardBack";
 import DeckRecipeDialog, { type DeckRecipeDialogRef } from "./DeckRecipeDialog";
 import { isSoundEnabledStore, playSound } from "../lib/_modules/snd";
 import Snd from "snd-lib";
+import { flushSync } from "react-dom";
 
 const DEFAULT_DECK_RECIPE = {
   body: 1,
@@ -133,7 +134,9 @@ function GameInner({
   const play = (playerIndex: number, cardIndex: number): void => {
     if (document.startViewTransition) {
       document.startViewTransition(() => {
-        performPlay(playerIndex, cardIndex);
+        flushSync(() => {
+          performPlay(playerIndex, cardIndex);
+        });
       });
     } else {
       performPlay(playerIndex, cardIndex);
@@ -176,7 +179,9 @@ function GameInner({
   const nextRound = (): void => {
     if (document.startViewTransition) {
       document.startViewTransition(() => {
-        performNextRound();
+        flushSync(() => {
+          performNextRound();
+        });
       });
     } else {
       performNextRound();
@@ -475,6 +480,26 @@ function GameInner({
         }
         * {
           min-width: 0;
+        }
+      `}</style>
+      <style jsx global>{`
+        :root::view-transition-group(*) {
+          animation-duration: 1s;
+        }
+        /* トランジション中のみ前後を指定したい場合はこうする */
+        /* :global(::view-transition-group(player-label-1)) {
+          z-index: -1;
+        } */
+        /* 移動のトランジションはgroupに対してかかっている */
+        /* :global(::view-transition-group(*)) {
+          animation: none;
+        } */
+        /* クロスフェードはold,newに対してかかっている */
+        ::view-transition-old(*) {
+          animation: none;
+        }
+        ::view-transition-new(*) {
+          animation: none;
         }
       `}</style>
     </>
