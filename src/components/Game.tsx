@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { checkNext, formatHtml } from './content-model-simple';
+import { checkNext, formatHtml } from './content-model';
 import type { ElementName } from './constants';
 import Card from './Card';
 import { startMatch } from './match';
