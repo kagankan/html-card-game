@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
-import type { ElementName } from './constants';
+import type { ElementName } from '../../service/constants';
 
 type DeckRecipe = Partial<Readonly<Record<ElementName, number>>>;
 

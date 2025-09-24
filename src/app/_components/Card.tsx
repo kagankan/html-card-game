@@ -1,5 +1,5 @@
 import { CSSProperties } from "react";
-import type { ElementName } from "./constants";
+import type { ElementName } from "../../service/constants";
 
 interface CardProps {
   element: ElementName;

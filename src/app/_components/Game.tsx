@@ -1,13 +1,13 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { checkNext, formatHtml } from "./content-model";
-import type { ElementName } from "./constants";
+import { checkNext, formatHtml } from "../../service/content-model";
+import type { ElementName } from "../../service/constants";
 import Card from "./Card";
-import { startMatch } from "./match";
+import { startMatch } from "../../service/match";
 import CardBack from "./CardBack";
 import DeckRecipeDialog, { type DeckRecipeDialogRef } from "./DeckRecipeDialog";
-import { isSoundEnabledStore, playSound } from "../lib/_modules/snd";
+import { isSoundEnabledStore, playSound } from "../../lib/_modules/snd";
 import Snd from "snd-lib";
 import { flushSync } from "react-dom";
 
