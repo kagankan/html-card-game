@@ -9,7 +9,7 @@
     "start": "next start",
     "export": "next build && next export",
     "test": "npm run test:integration && npm run test:unit",
-    "lint": "next lint && prettier --check .",
+    "lint": "eslint . && prettier --check .",
     "format": "prettier --write .",
     "test:integration": "playwright test",
     "test:unit": "vitest"
