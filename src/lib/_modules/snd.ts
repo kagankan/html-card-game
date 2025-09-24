@@ -25,7 +25,7 @@ class SimpleStore<T> {
 
   update(updater: (value: T) => T) {
     this.value = updater(this.value);
-    this.subscribers.forEach(subscriber => subscriber(this.value));
+    this.subscribers.forEach((subscriber) => subscriber(this.value));
   }
 
   get() {
@@ -34,7 +34,7 @@ class SimpleStore<T> {
 }
 
 (async () => {
-  if (typeof window !== 'undefined') {
+  if (typeof window !== "undefined") {
     snd = new Snd();
     await snd.load(Snd.KITS.SND01);
     isSoundLoaded = true;
