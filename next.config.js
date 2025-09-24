@@ -1,12 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
+  output: "export",
   trailingSlash: true,
   images: {
-    unoptimized: true
+    unoptimized: true,
   },
-  basePath: process.env.NODE_ENV === 'production' ? '/html-card-game' : '',
-  assetPrefix: process.env.NODE_ENV === 'production' ? '/html-card-game/' : '',
+  basePath: process.env.NODE_ENV === "production" ? "/html-card-game" : "",
+  assetPrefix: process.env.NODE_ENV === "production" ? "/html-card-game/" : "",
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -18,7 +18,7 @@ const nextConfig = {
     return config;
   },
   experimental: {
-    esmExternals: 'loose',
+    esmExternals: "loose",
   },
 };
 

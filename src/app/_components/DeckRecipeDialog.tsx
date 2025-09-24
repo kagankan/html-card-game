@@ -1,7 +1,12 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
-import type { ElementName } from '../../service/constants';
+import React, {
+  useState,
+  useEffect,
+  useImperativeHandle,
+  forwardRef,
+} from "react";
+import type { ElementName } from "../../service/constants";
 
 type DeckRecipe = Partial<Readonly<Record<ElementName, number>>>;
 
@@ -17,7 +22,9 @@ export interface DeckRecipeDialogRef {
 
 const DeckRecipeDialog = forwardRef<DeckRecipeDialogRef, DeckRecipeDialogProps>(
   ({ allowedElements, defaultDeckRecipe, onSubmit }, ref) => {
-    const [deckRecipe, setDeckRecipe] = useState<DeckRecipe>({ ...defaultDeckRecipe });
+    const [deckRecipe, setDeckRecipe] = useState<DeckRecipe>({
+      ...defaultDeckRecipe,
+    });
     const [isOpen, setIsOpen] = useState(false);
 
     useEffect(() => {
@@ -43,7 +50,7 @@ const DeckRecipeDialog = forwardRef<DeckRecipeDialogRef, DeckRecipeDialogProps>(
     if (!isOpen) return null;
 
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black">
         <dialog
           open
           className="relative z-50 max-h-[80vh] w-96 overflow-auto rounded-lg bg-white p-4 shadow-xl"
@@ -56,7 +63,10 @@ const DeckRecipeDialog = forwardRef<DeckRecipeDialogRef, DeckRecipeDialogProps>(
               {allowedElements.map((el) => {
                 const current = deckRecipe[el] ?? 0;
                 return (
-                  <li key={el} className="flex items-center justify-between py-1">
+                  <li
+                    key={el}
+                    className="flex items-center justify-between py-1"
+                  >
                     <span>{el}</span>
                     <span className="flex items-center justify-between overflow-clip rounded-lg bg-gray-100">
                       <button
@@ -71,7 +81,9 @@ const DeckRecipeDialog = forwardRef<DeckRecipeDialogRef, DeckRecipeDialogProps>(
                       >
                         -
                       </button>
-                      <span className="bg-white px-2 py-1 text-center">{current}</span>
+                      <span className="bg-white px-2 py-1 text-center">
+                        {current}
+                      </span>
                       <button
                         type="button"
                         onClick={() => {
@@ -109,9 +121,9 @@ const DeckRecipeDialog = forwardRef<DeckRecipeDialogRef, DeckRecipeDialogProps>(
         </dialog>
       </div>
     );
-  }
+  },
 );
 
-DeckRecipeDialog.displayName = 'DeckRecipeDialog';
+DeckRecipeDialog.displayName = "DeckRecipeDialog";
 
 export default DeckRecipeDialog;
