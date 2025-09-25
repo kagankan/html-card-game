@@ -47,7 +47,7 @@ const recipeToDeck = (
   );
 };
 
-export default function Game() {
+export default function Game({ onBackToTop }: { onBackToTop?: () => void }) {
   const [deckRecipe, setDeckRecipe] =
     useState<Partial<Record<ElementName, number>>>(DEFAULT_DECK_RECIPE);
   const [match, setMatch] = useState<ReturnType<typeof startMatch> | null>(
@@ -67,6 +67,7 @@ export default function Game() {
       initialMatch={match}
       deckRecipe={deckRecipe}
       setDeckRecipe={setDeckRecipe}
+      onBackToTop={onBackToTop}
     />
   );
 }
@@ -75,12 +76,14 @@ function GameInner({
   initialMatch,
   deckRecipe,
   setDeckRecipe,
+  onBackToTop,
 }: {
   initialMatch: ReturnType<typeof startMatch>;
   deckRecipe: Partial<Record<ElementName, number>>;
   setDeckRecipe: React.Dispatch<
     React.SetStateAction<Partial<Record<ElementName, number>>>
   >;
+  onBackToTop?: () => void;
 }) {
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
 
@@ -245,6 +248,16 @@ function GameInner({
       />
 
       <div className="Game">
+        {onBackToTop && (
+          <button
+            type="button"
+            className="absolute top-2 left-2 z-50 rounded-lg bg-gray-500 px-4 py-2 text-white hover:bg-gray-600"
+            onClick={onBackToTop}
+          >
+            ← トップページに戻る
+          </button>
+        )}
+
         <button
           type="button"
           className="absolute top-2 right-2 z-10 rounded-lg bg-blue-500 px-4 py-2 text-white"

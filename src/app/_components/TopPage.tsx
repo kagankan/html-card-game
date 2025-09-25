@@ -1,21 +1,12 @@
 "use client";
 
 import React from "react";
-import { useRouter } from "next/navigation";
 
-export default function TopPage() {
-  const router = useRouter();
+interface TopPageProps {
+  onStartGame: () => void;
+}
 
-  const handleStartGame = () => {
-    if (document.startViewTransition) {
-      document.startViewTransition(() => {
-        router.push("/game");
-      });
-    } else {
-      router.push("/game");
-    }
-  };
-
+export default function TopPage({ onStartGame }: TopPageProps) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
       <div className="max-w-md text-center">
@@ -29,7 +20,7 @@ export default function TopPage() {
 
         <div className="space-y-4">
           <button
-            onClick={handleStartGame}
+            onClick={onStartGame}
             className="w-full rounded-lg bg-blue-600 px-8 py-4 text-xl font-semibold text-white transition-all duration-200 hover:bg-blue-700 hover:shadow-lg focus:ring-4 focus:ring-blue-300 focus:outline-none"
             style={{ viewTransitionName: "start-button" }}
           >
