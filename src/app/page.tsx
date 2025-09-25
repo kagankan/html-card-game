@@ -8,23 +8,11 @@ export default function Home() {
   const [currentView, setCurrentView] = useState<"top" | "game">("top");
 
   const handleStartGame = () => {
-    if (document.startViewTransition) {
-      document.startViewTransition(() => {
-        setCurrentView("game");
-      });
-    } else {
-      setCurrentView("game");
-    }
+    setCurrentView("game");
   };
 
   const handleBackToTop = () => {
-    if (document.startViewTransition) {
-      document.startViewTransition(() => {
-        setCurrentView("top");
-      });
-    } else {
-      setCurrentView("top");
-    }
+    setCurrentView("top");
   };
 
   if (currentView === "top") {
