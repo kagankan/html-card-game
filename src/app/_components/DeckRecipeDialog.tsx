@@ -50,7 +50,7 @@ const DeckRecipeDialog = forwardRef<DeckRecipeDialogRef, DeckRecipeDialogProps>(
     if (!isOpen) return null;
 
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black">
         <dialog
           open
           className="relative z-50 max-h-[80vh] w-96 overflow-auto rounded-lg bg-white p-4 shadow-xl"

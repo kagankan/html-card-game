@@ -32,7 +32,7 @@ export default function Card({
         disabled={disabled}
         aria-pressed={selected}
       >
-        <span className="absolute left-0 top-0">&lt;{element}&gt;</span>
+        <span className="absolute top-0 left-0">&lt;{element}&gt;</span>
         <span className="text-3xl font-bold">{element}</span>
         {description && <span className="block">{description}</span>}
       </button>

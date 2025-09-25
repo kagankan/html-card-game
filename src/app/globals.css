@@ -1,6 +1,13 @@
-@import '@fontsource/fira-mono' layer(base);
+@import "@fontsource/fira-mono" layer(base);
 
-@import 'tailwindcss';
+@import "tailwindcss";
+
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
 
 :root {
   --font-body:

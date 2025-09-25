@@ -47,7 +47,7 @@ const recipeToDeck = (
   );
 };
 
-export default function Game() {
+export default function Game({ onBackToTop }: { onBackToTop?: () => void }) {
   const [deckRecipe, setDeckRecipe] =
     useState<Partial<Record<ElementName, number>>>(DEFAULT_DECK_RECIPE);
   const [match, setMatch] = useState<ReturnType<typeof startMatch> | null>(
@@ -67,6 +67,7 @@ export default function Game() {
       initialMatch={match}
       deckRecipe={deckRecipe}
       setDeckRecipe={setDeckRecipe}
+      onBackToTop={onBackToTop}
     />
   );
 }
@@ -75,12 +76,14 @@ function GameInner({
   initialMatch,
   deckRecipe,
   setDeckRecipe,
+  onBackToTop,
 }: {
   initialMatch: ReturnType<typeof startMatch>;
   deckRecipe: Partial<Record<ElementName, number>>;
   setDeckRecipe: React.Dispatch<
     React.SetStateAction<Partial<Record<ElementName, number>>>
   >;
+  onBackToTop?: () => void;
 }) {
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
 
@@ -245,9 +248,19 @@ function GameInner({
       />
 
       <div className="Game">
+        {onBackToTop && (
+          <button
+            type="button"
+            className="absolute top-2 left-2 z-50 rounded-lg bg-gray-500 px-4 py-2 text-white hover:bg-gray-600"
+            onClick={onBackToTop}
+          >
+            ← トップページに戻る
+          </button>
+        )}
+
         <button
           type="button"
-          className="absolute right-2 top-2 z-10 rounded-lg bg-blue-500 px-4 py-2 text-white"
+          className="absolute top-2 right-2 z-10 rounded-lg bg-blue-500 px-4 py-2 text-white"
           onClick={() => {
             deckRecipeDialogRef.current?.onOpen();
           }}
@@ -257,7 +270,7 @@ function GameInner({
 
         <button
           type="button"
-          className="absolute right-2 top-16 z-10 rounded-lg bg-blue-500 px-4 py-2 text-white"
+          className="absolute top-16 right-2 z-10 rounded-lg bg-blue-500 px-4 py-2 text-white"
           onClick={() => {
             isSoundEnabledStore.update((prev) => !prev);
           }}
@@ -267,7 +280,7 @@ function GameInner({
 
         {/* 相手 */}
         <section className="Game__Opponents">
-          <section className="relative isolate z-20 max-w-sm rounded-lg bg-gray-50 bg-opacity-50 p-8">
+          <section className="bg-opacity-50 relative isolate z-20 max-w-sm rounded-lg bg-gray-50 p-8">
             <div className="absolute inset-0 z-10 m-auto size-fit rounded-sm bg-slate-100 p-2">
               <p>CPU 1</p>
               <p>残り {match.players[1].length}枚</p>
@@ -304,7 +317,7 @@ function GameInner({
             {match.field.map((card, index) => (
               <li
                 key={`${card.id}-${index}`}
-                className="min-w-0 max-w-6 last:max-w-none last:shrink-0"
+                className="max-w-6 min-w-0 last:max-w-none last:shrink-0"
               >
                 <div className="w-24">
                   <Card
@@ -320,7 +333,7 @@ function GameInner({
             ))}
           </ul>
           {isTreeVisible && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+            <div className="bg-opacity-40 fixed inset-0 z-50 flex items-center justify-center bg-black">
               <div className="m-auto w-11/12 max-w-2xl rounded bg-slate-50 p-4 shadow-md">
                 <pre className="whitespace-pre-wrap">
                   <code>
