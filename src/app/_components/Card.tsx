@@ -20,7 +20,7 @@ export default function Card({
 }: CardProps) {
   return (
     <section
-      className={`relative isolate aspect-[58/89] w-full overflow-clip rounded-lg shadow ${
+      className={`relative isolate aspect-58/89 w-full overflow-clip rounded-lg shadow ${
         disabled ? "bg-gray-300" : "bg-white"
       } ${selected ? "border-4 border-blue-500" : ""}`}
       style={style}

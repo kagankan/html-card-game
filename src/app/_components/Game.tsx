@@ -276,7 +276,7 @@ function GameInner({
               {match.players[1].map((card, index) => {
                 const deg = (index - (match.players[1].length - 1) / 2) * 5;
                 return (
-                  <li key={card.id} className="min-w-0 last:flex-shrink-0">
+                  <li key={card.id} className="min-w-0 last:shrink-0">
                     <div
                       className="w-20"
                       style={{
@@ -360,7 +360,7 @@ function GameInner({
               {match.trash.map((card, index) => (
                 <li
                   key={`trash-${card.id}-${index}`}
-                  className="min-w-0 last:flex-shrink-0"
+                  className="min-w-0 last:shrink-0"
                 >
                   <div className="w-16">
                     <CardBack
@@ -387,7 +387,7 @@ function GameInner({
               return (
                 <li
                   key={card.id}
-                  className={`min-w-0 transition-transform last:flex-shrink-0 hover:z-10 hover:-translate-y-4 ${
+                  className={`min-w-0 transition-transform last:shrink-0 hover:z-10 hover:-translate-y-4 ${
                     selectedCardIndex === index ? "z-10 -translate-y-4" : ""
                   }`}
                 >

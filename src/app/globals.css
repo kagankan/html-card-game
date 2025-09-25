@@ -1,8 +1,6 @@
-@import "@fontsource/fira-mono";
+@import '@fontsource/fira-mono' layer(base);
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
 :root {
   --font-body:
