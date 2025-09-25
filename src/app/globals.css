@@ -106,3 +106,43 @@ button:focus:not(:focus-visible) {
   width: 1px;
   white-space: nowrap;
 }
+
+/* View Transition API Styles */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-group(*) {
+  animation-duration: 0.5s;
+  animation-timing-function: ease-in-out;
+}
+
+::view-transition-old(root) {
+  animation: slide-out-left 0.5s ease-in-out;
+}
+
+::view-transition-new(root) {
+  animation: slide-in-right 0.5s ease-in-out;
+}
+
+@keyframes slide-out-left {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
