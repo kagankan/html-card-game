@@ -5,8 +5,8 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  basePath: process.env.NODE_ENV === "production" ? "/html-card-game" : "",
-  assetPrefix: process.env.NODE_ENV === "production" ? "/html-card-game/" : "",
+  basePath: process.env.BASE_PATH ?? "",
+  assetPrefix: process.env.BASE_PATH ? `${process.env.BASE_PATH}/` : "",
   eslint: {
     ignoreDuringBuilds: true,
   },
