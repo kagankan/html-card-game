@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import styles from "./TopPage.module.css";
 
 interface TopPageProps {
   onStartGame: () => void;
@@ -8,10 +9,17 @@ interface TopPageProps {
 
 export default function TopPage({ onStartGame }: TopPageProps) {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
-      <div className="max-w-md text-center">
+    <div
+      className={`${styles.Background} flex min-h-screen items-center justify-center`}
+    >
+      <div className="text-center">
         <div className="mb-8">
-          <h1 className="mb-4 text-4xl font-bold text-gray-800">HTML 大富豪</h1>
+          <h1
+            className={`${styles.title} ${styles["title-gradation"]} ${styles["title-stroke"]} relative mb-4 font-bold`}
+          >
+            <span className="inline-block">HTML</span>{" "}
+            <span className="inline-block">大富豪</span>
+          </h1>
           <p className="text-lg text-gray-600">HTMLタグでカードゲーム！</p>
           <p className="text-sm text-gray-500">
             HTMLの要素とコンテンツモデルを学びながら楽しめるカードゲームです
@@ -21,7 +29,7 @@ export default function TopPage({ onStartGame }: TopPageProps) {
         <div className="space-y-4">
           <button
             onClick={onStartGame}
-            className="w-full rounded-lg bg-blue-600 px-8 py-4 text-xl font-semibold text-white transition-all duration-200 hover:bg-blue-700 hover:shadow-lg focus:ring-4 focus:ring-blue-300 focus:outline-none"
+            className={styles["rich-button"]}
             style={{ viewTransitionName: "start-button" }}
           >
             ゲームスタート

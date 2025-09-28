@@ -28,6 +28,7 @@ export default function RootLayout({
             gtag('config', 'G-53VW712TWK');
           `}
         </Script>
+        <link rel="icon" href="/favicon.svg" />
       </head>
       <body>
         <div className="app">
