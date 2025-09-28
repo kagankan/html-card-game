@@ -44,6 +44,55 @@ export default function TopPage({ onStartGame }: TopPageProps) {
 
           filter: drop-shadow(0.06em 0.04em 0 black);
         }
+
+        .rich-button {
+          --press-offset: 0.2em;
+
+          display: block;
+          width: 100%;
+          padding: 1rem 2rem;
+          /* 上下方向グラデーション */
+          background-image: linear-gradient(
+            to bottom,
+            var(--color-html-300) 10%,
+            var(--color-html-500) 90%
+          );
+          background-repeat: no-repeat;
+          background-position: left center;
+          color: white;
+          font-weight: 700;
+          box-shadow:
+            inset 0.05em 0.1em 0 var(--color-html-100),
+            inset -0.05em -0.1em 0 var(--color-html-700),
+            0 var(--press-offset) 0 var(--color-html-800);
+          border: 4px solid var(--color-html-600);
+          position: relative;
+          overflow: hidden;
+          transition: all 0.3s ease;
+          /* 文字に枠線 */
+          -webkit-text-stroke: 0.2em var(--color-html-600);
+          text-stroke: 0.2em var(--color-html-600);
+          paint-order: stroke fill;
+
+          font-size: 2rem;
+          border-radius: 1rem;
+          transition: all 0.2s ease-in-out;
+          &:hover {
+            /* filter: drop-shadow(0 0 0.1em var(--color-html-700)); */
+          }
+          &:active {
+            box-shadow:
+              inset 0.05em 0.1em 0.1em var(--color-html-600),
+              inset 0 0 0 var(--color-html-700),
+              0 0 0 var(--color-html-800);
+            translate: 0 var(--press-offset);
+            background-image: linear-gradient(
+              to bottom,
+              var(--color-html-400) 10%,
+              var(--color-html-500) 90%
+            );
+          }
+        }
       `}</style>
       <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
         <div className="text-center">
@@ -61,7 +110,7 @@ export default function TopPage({ onStartGame }: TopPageProps) {
           <div className="space-y-4">
             <button
               onClick={onStartGame}
-              className="w-full rounded-lg bg-blue-600 px-8 py-4 text-xl font-semibold text-white transition-all duration-200 hover:bg-blue-700 hover:shadow-lg focus:ring-4 focus:ring-blue-300 focus:outline-none"
+              className="rich-button"
               style={{ viewTransitionName: "start-button" }}
             >
               ゲームスタート
