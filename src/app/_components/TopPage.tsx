@@ -93,8 +93,33 @@ export default function TopPage({ onStartGame }: TopPageProps) {
             );
           }
         }
+
+        .Background {
+          --size: 3rem;
+          --angle: 55deg;
+          --color-1: var(--color-html-100);
+          --color-2: rgb(255, 255, 255, 0.3);
+          background-color: var(--color-1);
+          background-image:
+            linear-gradient(
+              var(--angle),
+              var(--color-2) 25%,
+              transparent 25% 75%,
+              var(--color-2) 75%
+            ),
+            linear-gradient(
+              calc(-1 * var(--angle)),
+              var(--color-2) 25%,
+              transparent 25% 75%,
+              var(--color-2) 75%
+            );
+          background-size: calc(var(--size) * cos(var(--angle))) var(--size);
+          background-position:
+            0 0,
+            calc(var(--size) * cos(var(--angle))) var(--size);
+        }
       `}</style>
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+      <div className="Background flex min-h-screen items-center justify-center">
         <div className="text-center">
           <div className="mb-8">
             <h1 className="title title-gradation title-stroke relative mb-4 text-9xl font-bold">
