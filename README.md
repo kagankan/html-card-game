@@ -1,38 +1,62 @@
-# create-svelte
+# HTML 大富豪
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte).
+HTMLの要素とコンテンツモデル(入れ子ルール)をゲーム化したカードゲームです。  
+楽しみながらHTMLの構造を学ぶことができます。
 
-## Creating a project
+## 公開URL
 
-If you're seeing this, you've probably already done this step. Congrats!
+- Firebase Hosting: https://html-card-game.web.app/
+- GitHub Pages: https://kagankan.github.io/html-card-game/
+
+## 技術仕様
+
+- **フレームワーク**: Next.js 15
+- **ライブラリ**: React 19
+- **言語**: TypeScript
+- **スタイリング**: Tailwind CSS
+- **ビルド**: Static Site Generation (SSG)
+- **デプロイ**: Firebase Hosting / GitHub Pages
+
+## 開発
+
+依存関係をインストールしてから、開発サーバーを起動します:
 
 ```bash
-# create a new project in the current directory
-npm create svelte@latest
-
-# create a new project in my-app
-npm create svelte@latest my-app
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```bash
+npm install
 npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
 ```
 
-## Building
+開発サーバーは http://localhost:3000 で起動します。
 
-To create a production version of your app:
+## ビルド
+
+本番環境用のビルドを作成します:
 
 ```bash
 npm run build
 ```
 
-You can preview the production build with `npm run preview`.
+ビルドされたファイルは `out` ディレクトリに出力されます。
 
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+## テスト
+
+```bash
+# 全てのテストを実行
+npm test
+
+# ユニットテストのみ実行
+npm run test:unit
+
+# E2Eテストのみ実行
+npm run test:integration
+```
+
+## リント・フォーマット
+
+```bash
+# リントチェック
+npm run lint
+
+# コードフォーマット
+npm run format
+```
