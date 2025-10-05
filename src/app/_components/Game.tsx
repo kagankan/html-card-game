@@ -10,6 +10,8 @@ import DeckRecipeDialog, { type DeckRecipeDialogRef } from "./DeckRecipeDialog";
 import { isSoundEnabledStore, playSound } from "../../lib/_modules/snd";
 import Snd from "snd-lib";
 import { flushSync } from "react-dom";
+import commonStyles from "./Common.module.css";
+import Button from "./Button";
 
 const DEFAULT_DECK_RECIPE = {
   body: 1,
@@ -247,36 +249,42 @@ function GameInner({
         onSubmit={handleDeckRecipeSubmit}
       />
 
-      <div className="Game">
+      <div className={`Game ${commonStyles.Background}`}>
         {onBackToTop && (
-          <button
+          <Button
             type="button"
-            className="absolute top-2 left-2 z-50 rounded-lg bg-gray-500 px-4 py-2 text-white hover:bg-gray-600"
+            className="absolute top-2 left-2 z-50"
+            size="small"
+            variant="secondary"
             onClick={onBackToTop}
           >
             ← トップページに戻る
-          </button>
+          </Button>
         )}
 
-        <button
+        <Button
           type="button"
-          className="absolute top-2 right-2 z-10 rounded-lg bg-blue-500 px-4 py-2 text-white"
+          className="absolute top-2 right-2 z-10"
+          size="small"
+          variant="secondary"
           onClick={() => {
             deckRecipeDialogRef.current?.onOpen();
           }}
         >
           使用するカードを選択
-        </button>
+        </Button>
 
-        <button
+        <Button
           type="button"
-          className="absolute top-16 right-2 z-10 rounded-lg bg-blue-500 px-4 py-2 text-white"
+          className="absolute top-16 right-2 z-10"
+          size="small"
+          variant="secondary"
           onClick={() => {
             isSoundEnabledStore.update((prev) => !prev);
           }}
         >
           {isSoundEnabled ? "音を無効にする" : "音を有効にする"}
-        </button>
+        </Button>
 
         {/* 相手 */}
         <section className="Game__Opponents">
@@ -345,24 +353,28 @@ function GameInner({
                       : "場にカードがありません"}
                   </code>
                 </pre>
-                <button
+                <Button
                   type="button"
                   onClick={() => setIsTreeVisible(false)}
-                  className="mt-4 rounded-lg bg-gray-500 px-4 py-2 text-white"
+                  className="mt-4"
+                  size="medium"
+                  variant="secondary"
                 >
                   閉じる
-                </button>
+                </Button>
               </div>
             </div>
           )}
           <p className="text-center">
-            <button
+            <Button
               type="button"
               onClick={() => setIsTreeVisible(true)}
-              className="mt-4 rounded-lg bg-blue-500 px-4 py-2 text-sm text-white"
+              className="mt-4"
+              size="small"
+              variant="secondary"
             >
               ツリーを表示
-            </button>
+            </Button>
           </p>
         </section>
 
@@ -423,30 +435,36 @@ function GameInner({
           </ul>
 
           <p className="text-center">
-            <button
+            <Button
               type="button"
               onClick={handlePlayCard}
-              className="mt-4 rounded-lg bg-blue-500 px-4 py-2 text-white disabled:bg-gray-300 disabled:text-gray-500"
+              className="mt-4"
+              size="medium"
+              variant="secondary"
               disabled={selectedCardIndex === null || turnPlayer === 1}
             >
               カードを出す
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
               onClick={handleClearSelection}
-              className="mt-4 rounded-lg bg-blue-500 px-4 py-2 text-white disabled:bg-gray-300 disabled:text-gray-500"
+              className="mt-4"
+              size="medium"
+              variant="secondary"
               disabled={selectedCardIndex === null}
             >
               選択解除
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
               onClick={pass}
-              className="mt-4 rounded-lg bg-blue-500 px-4 py-2 text-white disabled:bg-gray-300 disabled:text-gray-500"
+              className="mt-4"
+              size="medium"
+              variant="secondary"
               disabled={turnPlayer === 1}
             >
               パス
-            </button>
+            </Button>
           </p>
         </div>
 
@@ -454,13 +472,15 @@ function GameInner({
           {wonPlayer !== null && (
             <div className="rounded-lg bg-white p-4 text-center shadow-lg">
               <p>{wonPlayer === 0 ? "あなた" : "相手"}の勝ちです</p>
-              <button
+              <Button
                 type="button"
-                className="mt-4 rounded-lg bg-blue-500 px-4 py-2 text-white"
+                className="mt-4"
+                size="medium"
+                variant="secondary"
                 onClick={restartGame}
               >
                 最初から
-              </button>
+              </Button>
             </div>
           )}
         </section>
