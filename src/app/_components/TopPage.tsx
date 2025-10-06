@@ -2,6 +2,8 @@
 
 import React from "react";
 import styles from "./TopPage.module.css";
+import commonStyles from "./Common.module.css";
+import Button from "./Button";
 
 interface TopPageProps {
   onStartGame: () => void;
@@ -10,7 +12,7 @@ interface TopPageProps {
 export default function TopPage({ onStartGame }: TopPageProps) {
   return (
     <div
-      className={`${styles.Background} flex min-h-screen items-center justify-center`}
+      className={`${commonStyles.Background} flex min-h-screen items-center justify-center`}
     >
       <div className="text-center">
         <div className="mb-8">
@@ -27,13 +29,14 @@ export default function TopPage({ onStartGame }: TopPageProps) {
         </div>
 
         <div className="space-y-4">
-          <button
+          <Button
             onClick={onStartGame}
-            className={styles["rich-button"]}
+            size="large"
+            variant="primary"
             style={{ viewTransitionName: "start-button" }}
           >
             ゲームスタート
-          </button>
+          </Button>
 
           <div className="pt-4">
             <a

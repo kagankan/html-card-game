@@ -10,6 +10,8 @@ import DeckRecipeDialog, { type DeckRecipeDialogRef } from "./DeckRecipeDialog";
 import { isSoundEnabledStore, playSound } from "../../lib/_modules/snd";
 import Snd from "snd-lib";
 import { flushSync } from "react-dom";
+import commonStyles from "./Common.module.css";
+import Button from "./Button";
 
 const DEFAULT_DECK_RECIPE = {
   body: 1,
@@ -247,36 +249,44 @@ function GameInner({
         onSubmit={handleDeckRecipeSubmit}
       />
 
-      <div className="Game">
+      <div className={`Game ${commonStyles.Background}`}>
         {onBackToTop && (
-          <button
-            type="button"
-            className="absolute top-2 left-2 z-50 rounded-lg bg-gray-500 px-4 py-2 text-white hover:bg-gray-600"
-            onClick={onBackToTop}
-          >
-            ← トップページに戻る
-          </button>
+          <div className="fixed top-2 left-2 z-50">
+            <Button
+              type="button"
+              size="small"
+              variant="secondary"
+              onClick={onBackToTop}
+            >
+              ← トップページに戻る
+            </Button>
+          </div>
         )}
 
-        <button
-          type="button"
-          className="absolute top-2 right-2 z-10 rounded-lg bg-blue-500 px-4 py-2 text-white"
-          onClick={() => {
-            deckRecipeDialogRef.current?.onOpen();
-          }}
-        >
-          使用するカードを選択
-        </button>
+        {/* 各種操作ボタン */}
+        <div className="fixed top-2 right-2 z-50 flex flex-col items-end gap-2">
+          <Button
+            type="button"
+            size="small"
+            variant="secondary"
+            onClick={() => {
+              deckRecipeDialogRef.current?.onOpen();
+            }}
+          >
+            使用するカードを選択
+          </Button>
 
-        <button
-          type="button"
-          className="absolute top-16 right-2 z-10 rounded-lg bg-blue-500 px-4 py-2 text-white"
-          onClick={() => {
-            isSoundEnabledStore.update((prev) => !prev);
-          }}
-        >
-          {isSoundEnabled ? "音を無効にする" : "音を有効にする"}
-        </button>
+          <Button
+            type="button"
+            size="small"
+            variant="secondary"
+            onClick={() => {
+              isSoundEnabledStore.update((prev) => !prev);
+            }}
+          >
+            {isSoundEnabled ? "音を無効にする" : "音を有効にする"}
+          </Button>
+        </div>
 
         {/* 相手 */}
         <section className="Game__Opponents">
@@ -345,24 +355,28 @@ function GameInner({
                       : "場にカードがありません"}
                   </code>
                 </pre>
-                <button
+                <Button
                   type="button"
                   onClick={() => setIsTreeVisible(false)}
-                  className="mt-4 rounded-lg bg-gray-500 px-4 py-2 text-white"
+                  className="mt-4"
+                  size="medium"
+                  variant="secondary"
                 >
                   閉じる
-                </button>
+                </Button>
               </div>
             </div>
           )}
           <p className="text-center">
-            <button
+            <Button
               type="button"
               onClick={() => setIsTreeVisible(true)}
-              className="mt-4 rounded-lg bg-blue-500 px-4 py-2 text-sm text-white"
+              className="mt-4"
+              size="small"
+              variant="secondary"
             >
               ツリーを表示
-            </button>
+            </Button>
           </p>
         </section>
 
@@ -389,64 +403,72 @@ function GameInner({
           </section>
         </section>
 
-        <div className="Game__Hands">
-          <ul className="mx-auto flex max-w-4xl justify-center">
-            {match.players[0].map((card, index) => {
-              const el = card.element;
-              const ok = checkNext(
-                match.field.map((card) => card.element),
-                el,
-              );
-              return (
-                <li
-                  key={card.id}
-                  className={`min-w-0 transition-transform last:shrink-0 hover:z-10 hover:-translate-y-4 ${
-                    selectedCardIndex === index ? "z-10 -translate-y-4" : ""
-                  }`}
-                >
-                  <div className="w-[min(10rem,24vw)]">
-                    <Card
-                      element={el}
-                      description={el === "a" ? " (hrefなし)" : ""}
-                      onClick={() => handleCardClick(index)}
-                      disabled={!ok || turnPlayer === 1}
-                      selected={selectedCardIndex === index}
-                      style={{
-                        viewTransitionName: `card-${card.id}`,
-                        contain: "paint",
-                      }}
-                    />
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
+        <div className="Game__Hands grid grid-rows-[1fr_auto]">
+          <div className="min-h-0">
+            <ul className="mx-auto flex max-w-4xl justify-center">
+              {match.players[0].map((card, index) => {
+                const el = card.element;
+                const ok = checkNext(
+                  match.field.map((card) => card.element),
+                  el,
+                );
+                return (
+                  <li
+                    key={card.id}
+                    className={`min-w-0 transition-transform last:shrink-0 hover:z-10 hover:-translate-y-4 ${
+                      selectedCardIndex === index ? "z-10 -translate-y-4" : ""
+                    }`}
+                  >
+                    <div className="w-[min(10rem,24vw)]">
+                      <Card
+                        element={el}
+                        description={el === "a" ? " (hrefなし)" : ""}
+                        onClick={() => handleCardClick(index)}
+                        disabled={!ok || turnPlayer === 1}
+                        selected={selectedCardIndex === index}
+                        style={{
+                          viewTransitionName: `card-${card.id}`,
+                          contain: "paint",
+                        }}
+                      />
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
 
           <p className="text-center">
-            <button
+            <Button
               type="button"
               onClick={handlePlayCard}
-              className="mt-4 rounded-lg bg-blue-500 px-4 py-2 text-white disabled:bg-gray-300 disabled:text-gray-500"
+              className="mt-4"
+              size="medium"
+              variant="secondary"
               disabled={selectedCardIndex === null || turnPlayer === 1}
             >
               カードを出す
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
               onClick={handleClearSelection}
-              className="mt-4 rounded-lg bg-blue-500 px-4 py-2 text-white disabled:bg-gray-300 disabled:text-gray-500"
+              className="mt-4"
+              size="medium"
+              variant="secondary"
               disabled={selectedCardIndex === null}
             >
               選択解除
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
               onClick={pass}
-              className="mt-4 rounded-lg bg-blue-500 px-4 py-2 text-white disabled:bg-gray-300 disabled:text-gray-500"
+              className="mt-4"
+              size="medium"
+              variant="secondary"
               disabled={turnPlayer === 1}
             >
               パス
-            </button>
+            </Button>
           </p>
         </div>
 
@@ -454,13 +476,15 @@ function GameInner({
           {wonPlayer !== null && (
             <div className="rounded-lg bg-white p-4 text-center shadow-lg">
               <p>{wonPlayer === 0 ? "あなた" : "相手"}の勝ちです</p>
-              <button
+              <Button
                 type="button"
-                className="mt-4 rounded-lg bg-blue-500 px-4 py-2 text-white"
+                className="mt-4"
+                size="medium"
+                variant="secondary"
                 onClick={restartGame}
               >
                 最初から
-              </button>
+              </Button>
             </div>
           )}
         </section>
