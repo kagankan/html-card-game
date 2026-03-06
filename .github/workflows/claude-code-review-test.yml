@@ -36,7 +36,9 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          prompt: "/review-in-worktree ${{ github.event.pull_request.number }} 出力したレビュー結果を PR にコメントします"
+          prompt: |
+            /review-in-worktree ${{ github.event.pull_request.number }}
+            出力したレビュー結果を PR にコメントしてください。特定の行に対する指摘は mcp__github_inline_comment__create_inline_comment ツールを使用して、該当行にコメントしてください。変更案がある場合は、suggestion コードブロックで修正案を提示してください。
           claude_args: |
             --allowedTools "mcp__github_inline_comment__create_inline_comment"
           show_full_output: true
