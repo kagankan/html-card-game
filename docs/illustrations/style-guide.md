@@ -154,8 +154,6 @@ The environment and characters should use muted colors, while only the semantic 
 
 Use a restrained color palette with soft gradients and selective accent colors.
 
----
-
 ## 構図のルール
 
 - 主役を中央または明確な焦点位置に置く
@@ -166,13 +164,9 @@ Use a restrained color palette with soft gradients and selective accent colors.
 - 情報量を詰め込みすぎない
 - 装飾よりも意味の読みやすさを優先する
 
----
-
 ## 共通プロンプト
 
 playful conceptual illustration representing an HTML element, Nintendo-style visual clarity, symbolic but intuitive scene design, lineless illustration, soft gradients and subtle shading, rounded simplified forms, clean readable silhouette, semi-flat rendering with gentle depth, restrained color palette, muted base colors with selective accent colors, minimal background, clear focal point, charming pop atmosphere, focus on semantic role and interaction rather than literal UI.
-
----
 
 ## 追加指示
 
@@ -186,14 +180,6 @@ Use color sparingly so the semantic object remains the clear focal point.
 
 The environment and characters should use muted colors, while only the semantic element uses a brighter accent color.
 
----
-
 ## ネガティブプロンプト
 
 no text, no letters, no HTML tags, no browser UI, no web page mockup, no wireframe, no infographic, no lorem ipsum, no black outlines, no comic ink, no cel shading, no harsh shadows, no glossy realism, no dark fantasy, no medieval fantasy, no cinematic dramatic lighting, no busy background, no rainbow colors, no highly saturated colors everywhere.
-
----
-
-Use the same recurring character design in every image: a small chibi adventurer with a rounded blue explorer hat, dome-shaped crown, short soft brim, small top button, soft cream face, two vertical oval black eyes, no visible nose, no eyebrows, no detailed mouth, blue explorer outfit, small brown backpack, rounded mitten-like hands, short simple boots. Keep the character identical across illustrations.
-
-no nose, no changed hat, no hood, no beanie, no beret, no baseball cap, no pointed hat, no realistic face, no anime detailed eyes, no eyebrows, no eyelashes, no expressive mouth, no tall body, no slim body
