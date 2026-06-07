@@ -11,6 +11,7 @@ import {
   dealFromStock,
   canComplete,
   completeColumn,
+  TARGET_RUN_LENGTH,
   SOLITAIRE_DECK_RECIPE,
   type SpiderCard,
 } from "./spider";
@@ -74,13 +75,13 @@ describe("spider smoke", () => {
     expect(moveRun(state, 1, 0, 0)).toBeNull();
   });
 
-  it("canComplete / completeColumn: 4 枚の有効チェーンは手動で完成できる", () => {
-    const four = [card("div"), card("div"), card("div"), card("div")];
-    expect(canComplete(four)).toBe(true);
-    // 3 枚では完成できない
-    expect(canComplete(four.slice(0, 3))).toBe(false);
+  it("canComplete / completeColumn: 目標枚数の有効チェーンは手動で完成できる", () => {
+    const five = Array.from({ length: TARGET_RUN_LENGTH }, () => card("div"));
+    expect(canComplete(five)).toBe(true);
+    // 目標枚数未満では完成できない
+    expect(canComplete(five.slice(0, TARGET_RUN_LENGTH - 1))).toBe(false);
 
-    const state = { columns: [four], stock: [], foundations: [] };
+    const state = { columns: [five], stock: [], foundations: [] };
     const next = completeColumn(state, 0);
     expect(next).not.toBeNull();
     expect(next!.foundations.length).toBe(1);
@@ -88,17 +89,19 @@ describe("spider smoke", () => {
   });
 
   it("moveRun / dealFromStock は自動完成しない", () => {
-    const four = [card("div"), card("div"), card("div")];
+    // 目標枚数に達しても自動では取り除かれないことを確認
+    const nearComplete = Array.from({ length: TARGET_RUN_LENGTH - 1 }, () =>
+      card("div"),
+    );
     const state = {
-      columns: [four, [card("div")]],
+      columns: [nearComplete, [card("div")]],
       stock: [],
       foundations: [],
     };
-    // div を 3 枚並びの上に移すと 4 枚になるが、自動では取り除かれない
     const next = moveRun(state, 1, 0, 0);
     expect(next).not.toBeNull();
     expect(next!.foundations.length).toBe(0);
-    expect(next!.columns[0].length).toBe(4);
+    expect(next!.columns[0].length).toBe(TARGET_RUN_LENGTH);
   });
 
   it("dealFromStock: 各列に 1 枚配られる", () => {

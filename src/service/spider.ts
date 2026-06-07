@@ -43,32 +43,47 @@ export const INITIAL_ROWS = 2;
 /**
  * 表向きの連なりがこの長さ以上の有効なチェーンになったら、手動で完成として
  * 取り除ける。通常スパイダーの「K→A の 13 枚揃え」に相当する。短くすると易しい。
+ * 手動確定なので長めにして、深い入れ子を狙わせる。
  */
-export const TARGET_RUN_LENGTH = 4;
+export const TARGET_RUN_LENGTH = 5;
 
 /**
- * 山札のレシピ。入れ子にしやすいコンテナを中心に、合計 26 枚程度を用意する。
- * リーフ要素（hr / br / img）は親になれず詰まりやすいので少なめ。
+ * 山札のレシピ。入れ子にしやすいコンテナを中心に、合計 36 枚程度を用意する。
+ * リーフ（void）要素 hr / br / img / wbr は親になれず末端専用。
  * 数字を変えれば構成・難易度を調整できる。
+ *
+ * === クリア可能性の条件（数値を変えるときは必ず確認）===
+ * このゲームの連なりは 1 本道（各カードの子は 1 つ）。void 要素は子を持てない
+ * ので必ずチェーンの末端になる。つまり「void 1 個 ＝ 完成チェーン 1 本」が確定し、
+ * void が V 個あれば最低でも V 本の完成が必要になる。
+ * 全カードを消すには、N 枚（= 山札合計）を「各 TARGET_RUN_LENGTH 枚以上の
+ * チェーン」に分割し、その本数を V 本以上にできなければならない。
+ *
+ *   成立条件の目安:  floor(N / TARGET_RUN_LENGTH) >= (void の合計枚数)
+ *   ※ ちょうど等号だと分割の自由度がほぼ無くなり実質クリア不能。数本分の余裕を持たせる。
+ *
+ * 現在値: N = 36, TARGET_RUN_LENGTH = 5, void = hr+br+img+wbr = 4
+ *   → floor(36 / 5) = 7 >= 4（余裕 3 本）でクリア可能。
  */
 export const SOLITAIRE_DECK_RECIPE = {
-  div: 4,
-  section: 1,
+  div: 6,
+  section: 2,
   article: 1,
   ul: 2,
   ol: 1,
   li: 3,
-  p: 2,
-  span: 2,
-  a: 2,
-  em: 1,
-  strong: 1,
+  p: 3,
+  span: 4,
+  a: 3,
+  em: 2,
+  strong: 2,
   code: 1,
   blockquote: 1,
   button: 1,
   hr: 1,
   br: 1,
   img: 1,
+  wbr: 1,
 } as const satisfies Partial<Record<ElementName, number>>;
 
 // --- デッキ生成・配り --------------------------------------------------------
