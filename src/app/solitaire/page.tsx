@@ -6,11 +6,15 @@ import CardBack from "@/app/_components/CardBack";
 import Button from "@/app/_components/Button";
 import { formatHtml } from "@/service/content-model";
 import {
+  canComplete,
   canPlaceRun,
+  completeColumn,
+  faceUpStart,
   dealFromStock,
   dealSpider,
   isWon,
   moveRun,
+  TARGET_RUN_LENGTH,
   type SpiderState,
 } from "@/service/spider";
 
@@ -75,6 +79,14 @@ export default function SolitairePage() {
     }
   };
 
+  const handleComplete = (column: number) => {
+    const next = completeColumn(state, column);
+    if (next) {
+      setState(next);
+      setSelection(null);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-green-900 p-4 text-white">
       {/* ヘッダー */}
@@ -103,8 +115,10 @@ export default function SolitairePage() {
       <p className="mb-4 max-w-3xl text-xs text-white/80">
         表向きのカードをクリックして選ぶと、そのカード以下が連なりとして選択され、
         置ける列に「ここに置く」ボタンが出ます。並びの判定は「親のコンテンツモデルに
-        内包できるか」で決まります（例: ul→li は OK、li→ul は NG）。表向きの連なりが
-        有効なまま {/* TARGET_RUN_LENGTH */}4 枚以上になると完成して取り除かれます。
+        内包できるか」で決まります（例: ul は li を内包できる ＝ ul→li は OK）。表向きの
+        連なりが有効なまま {TARGET_RUN_LENGTH} 枚以上になると、列の下に出る「完成」
+        ボタンで好きなときに取り除けます（自動では取り除かれないので、納得いくまで深く
+        入れ子にできます）。
       </p>
 
       {won && (
@@ -172,6 +186,17 @@ export default function SolitairePage() {
                   );
                 })}
               </div>
+
+              {/* 完成ボタン（有効な連なりが目標枚数以上のとき） */}
+              {canComplete(column) && (
+                <button
+                  type="button"
+                  onClick={() => handleComplete(colIndex)}
+                  className="mt-1 w-full rounded bg-emerald-400 px-2 py-1 text-xs font-bold text-black"
+                >
+                  完成（{column.length - faceUpStart(column)} 枚）
+                </button>
+              )}
             </div>
           );
         })}

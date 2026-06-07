@@ -36,45 +36,39 @@ export type SpiderState = Readonly<{
 
 // --- 調整用パラメータ ---------------------------------------------------------
 
-/** 列の数 */
+/** 列の数。多いほど動かす余地が増えて易しくなる */
 export const COLUMN_COUNT = 7;
 /** 各列に最初に配る枚数（末尾の 1 枚だけ表向き、残りは裏向き） */
-export const INITIAL_ROWS = 3;
+export const INITIAL_ROWS = 2;
 /**
- * 表向きの連なりがこの長さ以上の有効なチェーンになったら完成として取り除く。
- * 通常スパイダーの「K→A の 13 枚揃え」に相当する。短くすると簡単になる。
+ * 表向きの連なりがこの長さ以上の有効なチェーンになったら、手動で完成として
+ * 取り除ける。通常スパイダーの「K→A の 13 枚揃え」に相当する。短くすると易しい。
  */
 export const TARGET_RUN_LENGTH = 4;
 
 /**
- * 山札のレシピ。入れ子にしやすい要素を中心に、合計 52 枚程度を用意する。
- * 数字を変えれば構成を調整できる。
+ * 山札のレシピ。入れ子にしやすいコンテナを中心に、合計 26 枚程度を用意する。
+ * リーフ要素（hr / br / img）は親になれず詰まりやすいので少なめ。
+ * 数字を変えれば構成・難易度を調整できる。
  */
 export const SOLITAIRE_DECK_RECIPE = {
-  div: 5,
-  section: 2,
-  article: 2,
-  aside: 1,
-  ul: 3,
+  div: 4,
+  section: 1,
+  article: 1,
+  ul: 2,
   ol: 1,
-  li: 4,
-  p: 4,
-  span: 4,
-  a: 3,
-  em: 2,
-  strong: 2,
-  code: 2,
-  b: 2,
-  i: 1,
-  small: 1,
-  blockquote: 2,
-  figure: 1,
-  figcaption: 1,
+  li: 3,
+  p: 2,
+  span: 2,
+  a: 2,
+  em: 1,
+  strong: 1,
+  code: 1,
+  blockquote: 1,
   button: 1,
-  label: 1,
-  br: 3,
-  hr: 2,
-  img: 2,
+  hr: 1,
+  br: 1,
+  img: 1,
 } as const satisfies Partial<Record<ElementName, number>>;
 
 // --- デッキ生成・配り --------------------------------------------------------
@@ -195,7 +189,7 @@ export const moveRun = (
     return col;
   });
 
-  return autoComplete({ ...state, columns });
+  return { ...state, columns };
 };
 
 /** 山札から各列に 1 枚ずつ配る */
@@ -207,46 +201,46 @@ export const dealFromStock = (state: SpiderState): SpiderState | null => {
     if (!card) return col;
     return [...col, { ...card, faceUp: true }];
   });
-  return autoComplete({ ...state, columns, stock });
+  return { ...state, columns, stock };
 };
 
 /**
- * 表向きの連なりが目標の長さ以上になった列を完成として取り除く。
- * 取り除いたら下の裏向きカードを表にする。連鎖完成も処理する。
+ * その列の表向きの連なりが、完成（取り除き）可能かどうか。
+ * 目標の長さ以上で、かつ有効な入れ子チェーンになっていれば可能。
  */
-export const autoComplete = (state: SpiderState): SpiderState => {
-  let columns = state.columns.map((c) => [...c]);
-  const foundations = [...state.foundations];
-  let changed = true;
+export const canComplete = (column: Column): boolean => {
+  const run = column.slice(faceUpStart(column));
+  return (
+    run.length >= TARGET_RUN_LENGTH &&
+    isValidChain(run.map((c) => c.element))
+  );
+};
 
-  while (changed) {
-    changed = false;
-    for (let i = 0; i < columns.length; i++) {
-      const col = columns[i];
-      const start = faceUpStart(col);
-      const run = col.slice(start);
-      if (
-        run.length >= TARGET_RUN_LENGTH &&
-        isValidChain(run.map((c) => c.element))
-      ) {
-        foundations.push(run);
-        const remaining = col.slice(0, start);
-        if (
-          remaining.length > 0 &&
-          !remaining[remaining.length - 1].faceUp
-        ) {
-          remaining[remaining.length - 1] = {
-            ...remaining[remaining.length - 1],
-            faceUp: true,
-          };
-        }
-        columns[i] = remaining;
-        changed = true;
-      }
-    }
+/**
+ * 列の表向きの連なりを完成として取り除く（プレイヤーが任意のタイミングで実行）。
+ * 取り除いたら下の裏向きカードを表にする。完成できない列なら null。
+ */
+export const completeColumn = (
+  state: SpiderState,
+  columnIndex: number,
+): SpiderState | null => {
+  const col = state.columns[columnIndex];
+  if (!col || !canComplete(col)) return null;
+
+  const start = faceUpStart(col);
+  const run = col.slice(start);
+  const remaining = col.slice(0, start);
+  if (remaining.length > 0 && !remaining[remaining.length - 1].faceUp) {
+    remaining[remaining.length - 1] = {
+      ...remaining[remaining.length - 1],
+      faceUp: true,
+    };
   }
 
-  return { ...state, columns, foundations };
+  const columns = state.columns.map((c, i) =>
+    i === columnIndex ? remaining : c,
+  );
+  return { ...state, columns, foundations: [...state.foundations, run] };
 };
 
 /** 全カードを片付けたら勝ち */

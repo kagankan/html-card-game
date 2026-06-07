@@ -9,7 +9,8 @@ import {
   canPlaceRun,
   moveRun,
   dealFromStock,
-  autoComplete,
+  canComplete,
+  completeColumn,
   SOLITAIRE_DECK_RECIPE,
   type SpiderCard,
 } from "./spider";
@@ -73,15 +74,31 @@ describe("spider smoke", () => {
     expect(moveRun(state, 1, 0, 0)).toBeNull();
   });
 
-  it("autoComplete: 4 枚の有効チェーンは完成して取り除かれる", () => {
+  it("canComplete / completeColumn: 4 枚の有効チェーンは手動で完成できる", () => {
+    const four = [card("div"), card("div"), card("div"), card("div")];
+    expect(canComplete(four)).toBe(true);
+    // 3 枚では完成できない
+    expect(canComplete(four.slice(0, 3))).toBe(false);
+
+    const state = { columns: [four], stock: [], foundations: [] };
+    const next = completeColumn(state, 0);
+    expect(next).not.toBeNull();
+    expect(next!.foundations.length).toBe(1);
+    expect(next!.columns[0].length).toBe(0);
+  });
+
+  it("moveRun / dealFromStock は自動完成しない", () => {
+    const four = [card("div"), card("div"), card("div")];
     const state = {
-      columns: [[card("div"), card("div"), card("div"), card("div")]],
+      columns: [four, [card("div")]],
       stock: [],
       foundations: [],
     };
-    const next = autoComplete(state);
-    expect(next.foundations.length).toBe(1);
-    expect(next.columns[0].length).toBe(0);
+    // div を 3 枚並びの上に移すと 4 枚になるが、自動では取り除かれない
+    const next = moveRun(state, 1, 0, 0);
+    expect(next).not.toBeNull();
+    expect(next!.foundations.length).toBe(0);
+    expect(next!.columns[0].length).toBe(4);
   });
 
   it("dealFromStock: 各列に 1 枚配られる", () => {
