@@ -1,0 +1,166 @@
+name: Claude Code Package Update Analysis
+
+on:
+  pull_request:
+    types: [opened, synchronize, ready_for_review, reopened]
+    # Optional: Only run on specific file changes
+    paths:
+      - package.json
+    #   - "src/**/*.ts"
+    #   - "src/**/*.tsx"
+    #   - "src/**/*.js"
+    #   - "src/**/*.jsx"
+
+jobs:
+  claude-review:
+    # Optional: Filter by PR author
+    # if: |
+    #   github.event.pull_request.user.login == 'external-contributor' ||
+    #   github.event.pull_request.user.login == 'new-developer' ||
+    #   github.event.pull_request.author_association == 'FIRST_TIME_CONTRIBUTOR'
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+      issues: read
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Run Claude Code Review
+        id: claude-review
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            PR #${{ github.event.pull_request.number }} のパッケージ更新による影響範囲を分析し、動作確認リストを生成してください。
+
+            ## 目的
+            
+            パッケージ更新 PR の影響範囲を調査し、動作確認リストを PR コメントとして投稿する。
+            
+            ## 制約
+            
+            - GitHub Actions 上で実行されるため、10分以内に完了すること
+            - diff は `gh pr diff` で取得する（`git diff` は使わない）
+            - ファイルの全文検索（grep）は最小限にとどめる。共通ライブラリの場合は検索せずスモークテストリストを生成する
+            - 結果は `impact-analysis.md` ファイルに書き出す（PR コメントへの投稿はワークフロー側が行う）
+            
+            ## 手順
+            
+            ### 1. 差分の確認
+            
+            PR の差分から更新されたパッケージを特定する。
+            
+            ```bash
+            gh pr diff <PR番号> --name-only
+            gh pr diff <PR番号>
+            ```
+            
+            `package.json` の変更を見て、パッケージ名・旧バージョン・新バージョンを把握する。
+            
+            ### 2. 影響範囲の判定
+            
+            更新されたパッケージが以下のどちらに該当するか判定する:
+            
+            - **特定機能のみで使用**: そのパッケージ固有の機能を提供するもの
+            - **共通ライブラリ**: 多くのファイルから参照されるもの
+            
+            **共通ライブラリの場合は手順3をスキップし、手順4の「影響範囲が広すぎる場合」に従う。** import 元の全探索は行わない。
+            
+            ### 3. 影響を受ける機能領域の特定（特定機能のみの場合）
+            
+            1. 更新されたパッケージを直接 import しているファイルを `grep -r "from '<パッケージ名>'" src/ --include="*.ts" --include="*.tsx" -l` で検索する（`node_modules` は検索しない）
+            2. 該当するファイルパスをマッピングテーブルに照合し、機能領域を特定する
+            3. 該当ファイルが5件以下であれば全件確認。6件以上であれば共通ライブラリとして扱う
+            
+            ### 4. 確認リストの生成
+            
+            #### 影響範囲が広すぎる場合
+            
+            共通ライブラリの更新で全ページに影響する可能性がある場合は:
+            
+            1. 全ページに影響する可能性がある旨を明記する
+            2. スモークテストリストを生成する
+            3. import 元の全探索は不要（時間がかかるため）
+            
+            ### 5. changelog の確認
+            
+            更新対象パッケージの changelog / release notes を確認する。
+            
+            1. パッケージのリポジトリ URL を特定する:
+               ```bash
+               jq -r '.repository.url // .repository // empty' node_modules/<package-name>/package.json
+               ```
+               `node_modules` がない場合は `pnpm info <package-name> repository.url` を使う。
+            2. changelog を確認する（以下の優先順で1つ試す。取得できたら次に進む）:
+               - GitHub Releases: `gh api "repos/<owner>/<repo>/releases" --jq '.[0:5] | .[].tag_name'`
+               - CHANGELOG.md の先頭: `curl -sL "https://raw.githubusercontent.com/<owner>/<repo>/main/CHANGELOG.md" | head -100`
+            3. 以下を判断する:
+               - 破壊的変更（Breaking Changes）の有無
+               - セキュリティ修正の内容
+               - 動作に影響しうる変更の有無
+            4. changelog を確認できなかった場合は推測で「破壊的変更はない」と書かない。確認できた範囲を記載し、確認できなかった旨を明記する
+            
+            ### 6. 結果の出力
+            
+            分析結果を `impact-analysis.md` に以下のフォーマットで書き出す。
+            
+            ```markdown
+            ## 影響調査結果
+            
+            ### 更新パッケージ
+            
+            | パッケージ | 変更 | 破壊的変更 |
+            |---|---|---|
+            | `{パッケージ名}` | {旧バージョン} → {新バージョン} | あり/なし |
+            
+            changelog: {リンク}
+            
+            {変更の要約（1-2行）}
+            
+            ### 影響を受ける機能領域
+            
+            - {機能領域1}
+            - {機能領域2}
+            - ...
+
+          claude_args: |
+            --allowedTools "Read,Write,Bash(gh pr diff *),Bash(gh pr view *),Bash(grep *),Bash(cat *),Bash(jq *),Bash(pnpm info *),Bash(gh api *),Bash(find *),Bash(head *),Bash(wc *),Bash(ls *),WebFetch"
+          show_full_output: true
+          # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
+          # or https://code.claude.com/docs/en/cli-reference for available 
+
+      - name: マーカーを付与
+        run: |
+          printf '<!-- impact-analysis -->\n' | cat - impact-analysis.md > comment.md
+
+      - name: 既存コメントを検索
+        id: find-comment
+        uses: peter-evans/find-comment@d5fe37641ad8451bdd80312415672ba26c86575e
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body-includes: <!-- impact-analysis -->
+
+      - name: コメントを投稿
+        if: steps.find-comment.outputs.comment-id == ''
+        uses: peter-evans/create-or-update-comment@71345be0265236311c031f5c7866368bd1eff043
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body-path: comment.md
+
+      - name: コメントを更新
+        if: steps.find-comment.outputs.comment-id != ''
+        uses: peter-evans/create-or-update-comment@71345be0265236311c031f5c7866368bd1eff043
+        with:
+          comment-id: ${{ steps.find-comment.outputs.comment-id }}
+          body-path: comment.md
+          edit-mode: replace
+
+
+          
