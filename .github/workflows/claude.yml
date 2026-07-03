@@ -43,6 +43,7 @@ jobs:
           # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
           # or https://code.claude.com/docs/en/cli-reference for available options
           claude_args: |
+            --model claude-sonnet-5
             --append-system-prompt "フィードバックでは日本語を使用すること。CLAUDE.md を遵守すること。"
             --allowedTools "Edit,Write,Bash(gh pr create:*),Bash(gh pr edit:*),Bash(gh pr view:*),Bash(gh issue view:*),Bash(gh issue comment:*),Bash(pnpm run test:*),Bash(pnpm run lint:*)"
 
