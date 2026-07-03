@@ -44,6 +44,7 @@ jobs:
           # or https://code.claude.com/docs/en/cli-reference for available options
           claude_args: |
             --append-system-prompt "フィードバックでは日本語を使用すること。CLAUDE.md を遵守すること。"
+            --allowedTools "Edit,Write,Bash(gh pr create:*),Bash(gh pr edit:*),Bash(gh pr view:*),Bash(gh issue view:*),Bash(gh issue comment:*),Bash(pnpm run test:*),Bash(pnpm run lint:*)"
 
           # Optional: Give a custom prompt to Claude. If this is not specified, Claude will perform the instructions specified in the comment that tagged it.
           # prompt: 'Update the pull request description to include a summary of changes.'
