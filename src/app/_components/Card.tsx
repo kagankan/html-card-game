@@ -28,7 +28,7 @@ export default function Card({
       <button
         type="button"
         onClick={onClick}
-        className="h-full w-full p-2 disabled:text-gray-500"
+        className="h-full w-full p-2 text-black disabled:text-gray-500"
         disabled={disabled}
         aria-pressed={selected}
       >
