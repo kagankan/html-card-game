@@ -29,7 +29,7 @@
     "snd-lib": "^1.1.2"
   },
   "devDependencies": {
-    "@playwright/test": "^1.28.1",
+    "@playwright/test": "^1.61.1",
     "@storybook/addon-docs": "^9.1.8",
     "@storybook/addon-onboarding": "^9.1.8",
     "@storybook/nextjs-vite": "^9.1.8",
