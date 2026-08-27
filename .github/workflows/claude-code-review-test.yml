@@ -37,38 +37,7 @@ jobs:
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           prompt: |
-            /review-in-worktree ${{ github.event.pull_request.number }}
-            レビュー結果を元に、以下の JSON 形式で review-payload.json をカレントディレクトリに Write してください。
-            インラインコメントを個別に投稿しないでください。
-
-            ```json
-            {
-              "body": "レビュー全体のサマリー（総評セクションの内容）",
-              "event": "COMMENT",
-              "comments": [
-                {
-                  "path": "src/example.ts",
-                  "line": 42,
-                  "side": "RIGHT",
-                  "body": "🔴 Critical: 指摘内容\n\n```suggestion\n修正案のコード\n```"
-                }
-              ]
-            }
-            ```
-
-            ルール:
-            - `body` には総評を記載する
-            - `comments` 配列に全指摘（Critical, Warning, Suggestion）をまとめる
-            - 各コメントの `body` には severity 絵文字プレフィックスを付ける
-            - 修正案がある場合は suggestion コードブロックで記載する
-            - `⚪ 検証の結果問題なし` の項目は comments に含めない（body のサマリーに含めてよい）
-            - 指摘がない場合は `comments` を空配列にする
-
-            review-payload.json を Write したら、続けて以下のコマンドを実行し、レビューを1回のリクエストでまとめて投稿してください:
-
-            ```sh
-            gh api "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews" --method POST --input review-payload.json
-            ```
+            /review-ci ${{ github.event.pull_request.number }}
           # gh api は claude-code-action がサブプロセス環境に渡す GitHub App トークン（GH_TOKEN）で認証されるため、投稿主は claude[bot] になる。
           # 別ステップの gh api（github.token = GITHUB_TOKEN）だと github-actions bot になってしまうため、必ず Claude 自身にこのコマンドを実行させる。
           claude_args: |
