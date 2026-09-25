@@ -45,6 +45,7 @@ jobs:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           prompt: |
             /review-ci ${{ github.event.pull_request.number }}
+            
             ツール実行が「時間切れ」という理由でブロックされた場合は、調査を打ち切ること。
             その時点までに見つかった指摘だけでレビュー結果を書き出し、投稿まで行う。
             その場合、冒頭には「⏱ 制限時間に達したため、途中までのレビュー結果です」と書く。
