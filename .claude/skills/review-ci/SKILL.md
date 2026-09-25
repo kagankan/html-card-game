@@ -11,6 +11,8 @@ allowed-tools: Skill, Bash, Write, Read, Glob, Grep, Task
 - `PR_NUM` = `$ARGUMENTS`
 - `REPO` = `gh repo view --json nameWithOwner -q .nameWithOwner` の実行結果
 
+レビューを始める前に、リポジトリ内の全ファイルを 1 ファイルずつ Read で読み、それぞれの役割を把握すること。Glob でまとめて済ませない。
+
 ## 1. レビュー実施
 
 `review-in-worktree` スキルを `$PR_NUM` を引数として実行する。
