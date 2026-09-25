@@ -72,6 +72,31 @@ const flattenContentPattern = (
   }
 };
 
+/** checkNext の結果キャッシュ。同じ場の状態で同じ要素を何度も判定するため */
+const checkNextCache = new Map<string, boolean>();
+
+const buildCacheKey = (
+  parents: readonly ElementName[],
+  tagName: ElementName,
+): string => {
+  return `${parents.join(">")}:${tagName}`;
+};
+
+/** 特別対応が必要な要素の判定。該当しなければ null を返す */
+const checkSpecialElement = (
+  parents: readonly ElementName[],
+  tagName: ElementName,
+): boolean | null => {
+  // @markuplint/html-specで判定できないものを特別対応
+  if (tagName === "html") {
+    return false;
+  }
+  if (tagName === "head" || tagName === "body") {
+    return parents.length === 1 && parents[0] === "html";
+  }
+  return null;
+};
+
 /**
  * 与えられた要素が次に出せるかどうか
  * documentを使うため、ブラウザ環境でのみ動作する
@@ -86,34 +111,37 @@ export const checkNext = (
     return true; //{ ok: true, queries: ["*"] };
   }
 
-  // @markuplint/html-specで判定できないものを特別対応
-  if (tagName === "html") {
-    return false;
+  const cacheKey = buildCacheKey(parents, tagName);
+  const cached = checkNextCache.get(cacheKey);
+  if (cached !== undefined) {
+    return cached;
   }
-  if (tagName === "head") {
-    return parents.length === 1 && parents[0] === "html";
-  }
-  if (tagName === "body") {
-    return parents.length === 1 && parents[0] === "html";
+
+  const result = checkNextUncached(parents, tagName);
+  checkNextCache.set(cacheKey, result);
+  return result;
+};
+
+const checkNextUncached = (
+  parents: readonly ElementName[],
+  tagName: ElementName,
+): boolean => {
+  const special = checkSpecialElement(parents, tagName);
+  if (special !== null) {
+    return special;
   }
 
   const element = document.createElement(tagName);
-  console.log(element);
-  console.log(parents);
 
   let first = true;
   let transparent = false;
   for (const parent of [...parents].reverse()) {
-    console.log("parent", parent);
     const contentModel = getContentModel(parent);
     if (contentModel == null) return false;
-    console.log(contentModel);
     // 最初の要素の場合、すべてのコンテンツモデルをチェック
     // 子要素が透過的なコンテンツモデルの場合、透過的なコンテンツモデルのみチェック
     if (first || transparent) {
-      console.log("first || transparent");
       const candidates = flattenContentPattern(contentModel, "*");
-      console.log(candidates);
 
       const queries = candidates.filter((model) => {
         const result = createSelector(model, htmlSpec).match(element);
