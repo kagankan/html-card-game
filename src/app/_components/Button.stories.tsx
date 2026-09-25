@@ -15,9 +15,15 @@ const meta: Meta<typeof Button> = {
     },
     variant: {
       control: "select",
-      options: ["primary", "secondary", "disabled"],
+      options: ["primary", "secondary", "danger", "disabled"],
     },
     disabled: {
+      control: "boolean",
+    },
+    loading: {
+      control: "boolean",
+    },
+    fullWidth: {
       control: "boolean",
     },
     onClick: { action: "clicked" },
@@ -68,6 +74,48 @@ export const Disabled: Story = {
   },
 };
 
+export const Danger: Story = {
+  args: {
+    children: "最初から",
+    size: "medium",
+    variant: "danger",
+  },
+};
+
+export const Loading: Story = {
+  args: {
+    children: "読み込み中",
+    size: "medium",
+    variant: "primary",
+    loading: true,
+  },
+};
+
+export const FullWidth: Story = {
+  args: {
+    children: "幅いっぱいのボタン",
+    size: "medium",
+    variant: "secondary",
+    fullWidth: true,
+  },
+  decorators: [
+    (Story) => (
+      <div style={{ width: "20rem" }}>
+        <Story />
+      </div>
+    ),
+  ],
+};
+
+export const WithIcon: Story = {
+  args: {
+    children: "トップページに戻る",
+    size: "small",
+    variant: "secondary",
+    icon: "←",
+  },
+};
+
 export const AllSizes: Story = {
   render: () => (
     <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
@@ -92,6 +140,9 @@ export const AllVariants: Story = {
       </Button>
       <Button size="medium" variant="secondary">
         Secondary Button
+      </Button>
+      <Button size="medium" variant="danger">
+        Danger Button
       </Button>
       <Button size="medium" variant="secondary" disabled>
         Disabled Button

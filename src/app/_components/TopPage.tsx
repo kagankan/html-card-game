@@ -33,6 +33,7 @@ export default function TopPage({ onStartGame }: TopPageProps) {
             onClick={onStartGame}
             size="large"
             variant="primary"
+            aria-label="ゲームを開始する"
             style={{ viewTransitionName: "start-button" }}
           >
             ゲームスタート
