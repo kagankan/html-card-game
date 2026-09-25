@@ -19,6 +19,10 @@ jobs:
     #   github.event.pull_request.author_association == 'FIRST_TIME_CONTRIBUTOR'
 
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      # この時間を過ぎたら、hook が投稿に必要なツール以外をブロックする
+      REVIEW_TIME_LIMIT_MINUTES: 5
     permissions:
       contents: read
       pull-requests: write
@@ -31,6 +35,9 @@ jobs:
         with:
           fetch-depth: 1
 
+      - name: レビューの締め切り時刻を記録
+        run: echo "REVIEW_DEADLINE=$(( $(date +%s) + REVIEW_TIME_LIMIT_MINUTES * 60 ))" >> "$GITHUB_ENV"
+
       - name: Run Claude Code Review
         id: claude-review
         uses: anthropics/claude-code-action@v1
@@ -38,10 +45,26 @@ jobs:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           prompt: |
             /review-ci ${{ github.event.pull_request.number }}
+            ツール実行が「時間切れ」という理由でブロックされた場合は、調査を打ち切ること。
+            その時点までに見つかった指摘だけでレビュー結果を書き出し、投稿まで行う。
+            その場合、冒頭には「⏱ 制限時間に達したため、途中までのレビュー結果です」と書く。
           # gh api は claude-code-action がサブプロセス環境に渡す GitHub App トークン（GH_TOKEN）で認証されるため、投稿主は claude[bot] になる。
           # 別ステップの gh api（github.token = GITHUB_TOKEN）だと github-actions bot になってしまうため、必ず Claude 自身にこのコマンドを実行させる。
           claude_args: |
-            --allowedTools "Write,Bash(gh api:*)"
+            --allowedTools "Read,Glob,Grep,Write,Bash(gh api:*),Bash(jq:*)"
+          settings: |
+            {
+              "hooks": {
+                "PreToolUse": [
+                  {
+                    "matcher": "*",
+                    "hooks": [
+                      { "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/.github/scripts/review-deadline-hook.mjs\"" }
+                    ]
+                  }
+                ]
+              }
+            }
           show_full_output: true
           # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
           # or https://code.claude.com/docs/en/cli-reference for available options
