@@ -13,8 +13,13 @@ const meta: Meta<typeof Card> = {
     description: "",
     disabled: false,
     selected: false,
+    size: "medium",
   },
   argTypes: {
+    size: {
+      control: "select",
+      options: ["small", "medium", "large"],
+    },
     element: {
       control: "select",
       options: [
@@ -77,6 +82,20 @@ export const Disabled: Story = {
   args: {
     element: "span",
     disabled: true,
+  },
+};
+
+export const Small: Story = {
+  args: {
+    element: "section",
+    size: "small",
+  },
+};
+
+export const Large: Story = {
+  args: {
+    element: "section",
+    size: "large",
   },
 };
 

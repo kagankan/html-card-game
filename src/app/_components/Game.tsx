@@ -2,9 +2,22 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { checkNext, formatHtml } from "../../service/content-model";
-import type { ElementName } from "../../service/constants";
 import Card from "./Card";
-import { startMatch } from "../../service/match";
+import {
+  clearField,
+  findWinner,
+  nextTurn,
+  playCard,
+  startMatch,
+  type Match,
+  type PlayerIndex,
+} from "../../service/match";
+import {
+  ALLOWED_ELEMENTS,
+  DEFAULT_DECK_RECIPE,
+  recipeToDeck,
+  type DeckRecipe,
+} from "../../service/deck";
 import CardBack from "./CardBack";
 import DeckRecipeDialog, { type DeckRecipeDialogRef } from "./DeckRecipeDialog";
 import { isSoundEnabledStore, playSound } from "../../lib/_modules/snd";
@@ -13,51 +26,16 @@ import { flushSync } from "react-dom";
 import commonStyles from "./Common.module.css";
 import Button from "./Button";
 
-const DEFAULT_DECK_RECIPE = {
-  body: 1,
-  div: 1,
-  span: 1,
-  a: 1,
-  hr: 1,
-  p: 1,
-  button: 1,
-  ul: 1,
-  li: 1,
-  br: 1,
-  nav: 0,
-  header: 0,
-  footer: 0,
-  main: 1,
-  aside: 1,
-  section: 1,
-  article: 1,
-  h1: 1,
-  h2: 1,
-  script: 1,
-  style: 1,
-  meta: 0,
-  title: 0,
-} as const satisfies Partial<Record<ElementName, number>>;
-
-const ALLOWED_ELEMENTS = Object.keys(DEFAULT_DECK_RECIPE) as ElementName[];
-
-const recipeToDeck = (
-  recipe: Partial<Record<ElementName, number>>,
-): ElementName[] => {
-  return (Object.entries(recipe) as [ElementName, number][]).flatMap(
-    ([element, count]) => Array.from({ length: count }, () => element),
-  );
-};
+const PLAYER_COUNT = 2;
+const CPU_THINKING_TIME_MS = 1000;
 
 export default function Game({ onBackToTop }: { onBackToTop?: () => void }) {
-  const [deckRecipe, setDeckRecipe] =
-    useState<Partial<Record<ElementName, number>>>(DEFAULT_DECK_RECIPE);
-  const [match, setMatch] = useState<ReturnType<typeof startMatch> | null>(
-    null,
-  );
+  const [deckRecipe, setDeckRecipe] = useState<DeckRecipe>(DEFAULT_DECK_RECIPE);
+  const [match, setMatch] = useState<Match | null>(null);
 
   useEffect(() => {
-    setMatch(startMatch(recipeToDeck(deckRecipe), 2));
+    const result = startMatch(recipeToDeck(deckRecipe), PLAYER_COUNT);
+    setMatch(result.ok ? result.value : null);
   }, [deckRecipe]);
 
   if (!match) {
@@ -80,20 +58,17 @@ function GameInner({
   setDeckRecipe,
   onBackToTop,
 }: {
-  initialMatch: ReturnType<typeof startMatch>;
-  deckRecipe: Partial<Record<ElementName, number>>;
-  setDeckRecipe: React.Dispatch<
-    React.SetStateAction<Partial<Record<ElementName, number>>>
-  >;
+  initialMatch: Match;
+  deckRecipe: DeckRecipe;
+  setDeckRecipe: React.Dispatch<React.SetStateAction<DeckRecipe>>;
   onBackToTop?: () => void;
 }) {
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
 
-  const [match, setMatch] =
-    useState<ReturnType<typeof startMatch>>(initialMatch);
-  const [turnPlayer, setTurnPlayer] = useState<0 | 1>(0);
+  const [match, setMatch] = useState<Match>(initialMatch);
+  const [turnPlayer, setTurnPlayer] = useState<PlayerIndex>(0);
   const [passedPlayers, setPassedPlayers] = useState({ 0: false, 1: false });
-  const [wonPlayer, setWonPlayer] = useState<0 | 1 | null>(null);
+  const [wonPlayer, setWonPlayer] = useState<PlayerIndex | null>(null);
   const [selectedCardIndex, setSelectedCardIndex] = useState<number | null>(
     null,
   );
@@ -109,22 +84,18 @@ function GameInner({
 
   // Check for winner
   useEffect(() => {
-    if (match.players[0].length === 0) {
-      setWonPlayer(0);
-    } else if (match.players[1].length === 0) {
-      setWonPlayer(1);
-    }
-  }, [match.players]);
+    setWonPlayer(findWinner(match));
+  }, [match]);
 
   // CPU turn logic
   useEffect(() => {
     if (turnPlayer === 1) {
       const timer = setTimeout(() => {
         playCpu();
-      }, 1000);
+      }, CPU_THINKING_TIME_MS);
       return () => clearTimeout(timer);
     }
-  }, [turnPlayer, match]);
+  }, [turnPlayer]);
 
   // Auto next round logic
   useEffect(() => {
@@ -149,21 +120,15 @@ function GameInner({
   };
 
   const performPlay = (playerIndex: number, cardIndex: number): void => {
-    const newPlayers = [...match.players];
-    newPlayers[playerIndex] = newPlayers[playerIndex].filter(
-      (_, index) => index !== cardIndex,
-    );
-    const card = match.players[playerIndex][cardIndex];
-    setMatch({
-      ...match,
-      field: [...match.field, card],
-      players: newPlayers,
-    });
+    const result = playCard(match, playerIndex, cardIndex);
+    if (result.ok) {
+      setMatch(result.value);
+    }
   };
 
   const pass = (): void => {
     setPassedPlayers((prev) => ({ ...prev, [turnPlayer]: true }));
-    setTurnPlayer((prev) => (1 - prev) as 0 | 1);
+    setTurnPlayer((prev) => nextTurn(prev));
   };
 
   const playCpu = (): void => {
@@ -194,23 +159,23 @@ function GameInner({
   };
 
   const performNextRound = (): void => {
-    setMatch((prev) => ({
-      ...prev,
-      field: [],
-      trash: [...prev.trash, ...prev.field],
-    }));
+    setMatch((prev) => clearField(prev));
     setPassedPlayers({ 0: false, 1: false });
   };
 
-  const handleDeckRecipeSubmit = (
-    value: Partial<Record<ElementName, number>>,
-  ) => {
-    setDeckRecipe(value);
-    setMatch(startMatch(recipeToDeck(value), 2));
+  const resetGame = (recipe: DeckRecipe) => {
+    const result = startMatch(recipeToDeck(recipe), PLAYER_COUNT);
+    if (!result.ok) return;
+    setMatch(result.value);
     setTurnPlayer(0);
     setPassedPlayers({ 0: false, 1: false });
     setWonPlayer(null);
     setSelectedCardIndex(null);
+  };
+
+  const handleDeckRecipeSubmit = (value: DeckRecipe) => {
+    setDeckRecipe(value);
+    resetGame(value);
   };
 
   const handleCardClick = (index: number) => {
@@ -233,11 +198,7 @@ function GameInner({
   };
 
   const restartGame = () => {
-    setMatch(startMatch(recipeToDeck(deckRecipe), 2));
-    setTurnPlayer(0);
-    setPassedPlayers({ 0: false, 1: false });
-    setWonPlayer(null);
-    setSelectedCardIndex(null);
+    resetGame(deckRecipe);
   };
 
   return (
@@ -246,6 +207,7 @@ function GameInner({
         ref={deckRecipeDialogRef}
         allowedElements={ALLOWED_ELEMENTS}
         defaultDeckRecipe={deckRecipe}
+        playerCount={PLAYER_COUNT}
         onSubmit={handleDeckRecipeSubmit}
       />
 
@@ -307,6 +269,7 @@ function GameInner({
                       }}
                     >
                       <CardBack
+                        color="red"
                         style={{
                           viewTransitionName: `card-${card.id}`,
                           contain: "paint",
@@ -332,6 +295,7 @@ function GameInner({
                 <div className="w-24">
                   <Card
                     element={card.element}
+                    size="small"
                     description={card.element === "a" ? " (hrefなし)" : ""}
                     style={{
                       viewTransitionName: `card-${card.id}`,
@@ -391,6 +355,7 @@ function GameInner({
                 >
                   <div className="w-16">
                     <CardBack
+                      color="blue"
                       style={{
                         viewTransitionName: `card-${card.id}`,
                         contain: "paint",
@@ -414,7 +379,7 @@ function GameInner({
                 );
                 return (
                   <li
-                    key={card.id}
+                    key={index}
                     className={`min-w-0 transition-transform last:shrink-0 hover:z-10 hover:-translate-y-4 ${
                       selectedCardIndex === index ? "z-10 -translate-y-4" : ""
                     }`}
@@ -480,7 +445,7 @@ function GameInner({
                 type="button"
                 className="mt-4"
                 size="medium"
-                variant="secondary"
+                variant="danger"
                 onClick={restartGame}
               >
                 最初から

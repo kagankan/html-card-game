@@ -126,6 +126,24 @@ export const MinimalElements: Story = {
   },
 };
 
+export const TooFewCards: Story = {
+  args: {
+    allowedElements: ["div", "span", "p"] as ElementName[],
+    defaultDeckRecipe: {
+      div: 1,
+      span: 1,
+    },
+  },
+};
+
+export const CustomTitle: Story = {
+  args: {
+    allowedElements,
+    defaultDeckRecipe,
+    title: "デッキを編集",
+  },
+};
+
 export const ManyElements: Story = {
   args: {
     allowedElements,

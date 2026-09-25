@@ -11,6 +11,10 @@ const meta: Meta<typeof CardBack> = {
   tags: ["autodocs"],
   args: {},
   argTypes: {
+    color: {
+      control: "select",
+      options: ["green", "blue", "red"],
+    },
     style: {
       control: "object",
     },
@@ -31,6 +35,28 @@ export const CustomSize: Story = {
       height: "300px",
     },
   },
+};
+
+export const Red: Story = {
+  args: {
+    color: "red",
+  },
+};
+
+export const Blue: Story = {
+  args: {
+    color: "blue",
+  },
+};
+
+export const AllColors: Story = {
+  render: () => (
+    <div style={{ display: "flex", gap: "1rem" }}>
+      <CardBack color="green" />
+      <CardBack color="blue" />
+      <CardBack color="red" />
+    </div>
+  ),
 };
 
 export const Multiple: Story = {
